@@ -74,27 +74,66 @@ async function login(req, res) {
   return res.json({ token, user: sanitizeUser(user) });
 }
 
-async function loginWithGoogle(req, res) {
-  const { accessToken } = req.body;
-  if (!accessToken) return res.status(400).json({ error: 'accessToken is required' });
+// Google OAuth uses a backend-mediated redirect flow because Expo Go's
+// redirect URI (exp://...) is rejected by Google for web-application clients.
+// Mobile opens googleOAuthStart in a browser; Google redirects to
+// googleOAuthCallback on our server, which then redirects back into the app.
+function googleOAuthStart(req, res) {
+  const { redirect_uri } = req.query;
+  if (!redirect_uri) return res.status(400).send('Missing redirect_uri');
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.BACKEND_URL) {
+    return res.status(500).send('Google sign-in is not configured on the server');
+  }
+
+  const callbackUrl = `${process.env.BACKEND_URL}/api/auth/google/callback`;
+  const params = new URLSearchParams({
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    redirect_uri: callbackUrl,
+    response_type: 'code',
+    scope: 'openid email profile',
+    state: redirect_uri,
+    prompt: 'select_account',
+  });
+
+  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
+}
+
+async function googleOAuthCallback(req, res) {
+  const { code, state, error: googleError } = req.query;
+  if (!state) return res.status(400).send('Missing state');
+  if (googleError) return res.redirect(`${state}?error=${encodeURIComponent(googleError)}`);
+  if (!code) return res.redirect(`${state}?error=missing_code`);
 
   try {
-    const gRes = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+    const callbackUrl = `${process.env.BACKEND_URL}/api/auth/google/callback`;
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        code,
+        redirect_uri: callbackUrl,
+        grant_type: 'authorization_code',
+      }),
     });
-    const info = await gRes.json();
-
-    if (info.error || !info.email) {
-      return res.status(401).json({ error: 'Invalid Google token' });
+    const tokenData = await tokenRes.json();
+    if (tokenData.error) {
+      return res.redirect(`${state}?error=${encodeURIComponent(tokenData.error)}`);
     }
 
-    const email = info.email.toLowerCase();
-    const user = await findOrCreateOAuthUser(email, 'google', info.sub);
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const info = await userRes.json();
+    if (!info.email) return res.redirect(`${state}?error=no_email`);
+
+    const user = await findOrCreateOAuthUser(info.email.toLowerCase(), 'google', info.sub);
     const token = signToken(user.id);
-    return res.json({ token, user: sanitizeUser(user) });
+    return res.redirect(`${state}?token=${encodeURIComponent(token)}`);
   } catch (err) {
-    console.error('[google-auth]', err);
-    return res.status(500).json({ error: 'Google authentication failed' });
+    console.error('[google-oauth-callback]', err);
+    return res.redirect(`${state}?error=server_error`);
   }
 }
 
@@ -143,4 +182,4 @@ function sanitizeUser(user) {
   return safe;
 }
 
-module.exports = { register, login, loginWithGoogle, loginWithApple };
+module.exports = { register, login, googleOAuthStart, googleOAuthCallback, loginWithApple };

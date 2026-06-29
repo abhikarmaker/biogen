@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -15,14 +15,14 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import Colors from '../constants/colors';
-import { login, register, loginWithGoogle, loginWithApple } from '../services/auth';
+import { login, register, completeGoogleLogin, loginWithApple } from '../services/auth';
 import { useUser } from '../context/UserContext';
 
-WebBrowser.maybeCompleteAuthSession();
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
 const DEMO_EMAIL = 'demo@biogen.app';
 const DEMO_PASS = 'demo123';
@@ -37,45 +37,31 @@ export default function Auth() {
   const [showPass, setShowPass] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
 
-  const [, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  });
-
-  useEffect(() => {
-    if (googleResponse?.type === 'success') {
-      const accessToken = googleResponse.authentication?.accessToken;
-      if (accessToken) {
-        handleGoogleToken(accessToken);
-      }
-    } else if (googleResponse?.type === 'error') {
-      setOauthLoading(null);
-      Alert.alert('Error', 'Google sign-in failed. Please try again.');
-    } else if (googleResponse?.type === 'dismiss') {
-      setOauthLoading(null);
-    }
-  }, [googleResponse]);
-
-  const handleGoogleToken = async (accessToken) => {
-    setOauthLoading('google');
-    try {
-      const user = await loginWithGoogle(accessToken);
-      setUser(user);
-    } catch (err) {
-      Alert.alert('Error', err.message || 'Google sign-in failed.');
-    } finally {
-      setOauthLoading(null);
-    }
-  };
-
   const handleGoogleSignIn = async () => {
     if (!process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID) {
       Alert.alert('Not configured', 'Google sign-in is not set up yet. Use email & password for now.');
       return;
     }
     setOauthLoading('google');
-    await promptGoogleAsync();
+    try {
+      const redirectUrl = Linking.createURL('oauth-callback');
+      const authUrl = `${API_URL}/api/auth/google/start?redirect_uri=${encodeURIComponent(redirectUrl)}`;
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
+
+      if (result.type === 'success' && result.url) {
+        const { queryParams } = Linking.parse(result.url);
+        if (queryParams?.token) {
+          const user = await completeGoogleLogin(queryParams.token);
+          setUser(user);
+        } else {
+          Alert.alert('Error', `Google sign-in failed: ${queryParams?.error || 'unknown error'}`);
+        }
+      }
+    } catch (err) {
+      Alert.alert('Error', err.message || 'Google sign-in failed.');
+    } finally {
+      setOauthLoading(null);
+    }
   };
 
   const handleAppleSignIn = async () => {

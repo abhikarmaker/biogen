@@ -65,17 +65,15 @@ export const login = async (email, password) => {
   }
 };
 
-export const loginWithGoogle = async (accessToken) => {
-  try {
-    const res = await authApi.post('/api/auth/google', { accessToken });
-    const { token, user } = res.data;
-    await saveToken(token);
-    await saveUser(user);
-    return user;
-  } catch (err) {
-    if (err.response) throw err;
-    throw new Error('Google sign-in requires an internet connection.');
-  }
+// Google sign-in completes via a backend redirect (see Auth.js); the backend
+// hands back our own JWT directly, so we just save it and fetch the profile.
+export const completeGoogleLogin = async (token) => {
+  await saveToken(token);
+  const res = await authApi.get('/api/user/profile', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  await saveUser(res.data);
+  return res.data;
 };
 
 export const loginWithApple = async (identityToken, email, fullName) => {
