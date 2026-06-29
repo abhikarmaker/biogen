@@ -3,8 +3,9 @@ const Stripe = require('stripe');
 let _stripe = null;
 function getStripe() {
   if (!_stripe) {
-    if (!process.env.STRIPE_SECRET_KEY) return null;
-    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-09-30.acacia' });
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key || !key.startsWith('sk_')) return null;
+    _stripe = new Stripe(key, { apiVersion: '2024-09-30.acacia' });
   }
   return _stripe;
 }

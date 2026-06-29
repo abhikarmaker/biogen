@@ -27,22 +27,26 @@ router.post('/login', async (req, res) => {
 
 // ── Overview metrics ───────────────────────────────────
 router.get('/overview', adminMiddleware, async (req, res) => {
-  const [users, bios, subs, todayBios] = await Promise.all([
-    supabase.from('users').select('id', { count: 'exact', head: true }),
-    supabase.from('bios').select('id', { count: 'exact', head: true }),
-    supabase.from('subscriptions').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-    supabase
-      .from('bios')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
-  ]);
+  try {
+    const [users, bios, subs, todayBios] = await Promise.all([
+      supabase.from('users').select('id', { count: 'exact', head: true }),
+      supabase.from('bios').select('id', { count: 'exact', head: true }),
+      supabase.from('subscriptions').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+      supabase
+        .from('bios')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+    ]);
 
-  return res.json({
-    totalUsers: users.count || 0,
-    totalBios: bios.count || 0,
-    activeSubscribers: subs.count || 0,
-    biosToday: todayBios.count || 0,
-  });
+    return res.json({
+      totalUsers: users.count || 0,
+      totalBios: bios.count || 0,
+      activeSubscribers: subs.count || 0,
+      biosToday: todayBios.count || 0,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 // ── Users ──────────────────────────────────────────────
