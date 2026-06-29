@@ -156,7 +156,7 @@ router.get('/users', adminMiddleware, async (req, res) => {
 
   let query = supabase
     .from('users')
-    .select('id, email, plan, bio_count, created_at, last_active_at', { count: 'exact' })
+    .select('id, email, plan, bio_count, created_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(Number(offset), Number(offset) + Number(limit) - 1);
 
@@ -232,8 +232,9 @@ router.get('/errors', adminMiddleware, async (req, res) => {
     .select('*')
     .order('created_at', { ascending: false })
     .limit(100);
-  if (error) return res.status(500).json({ error: error.message });
-  return res.json({ errors: data });
+  // error_logs table may not exist yet — return empty array rather than 500
+  if (error) return res.json({ errors: [] });
+  return res.json({ errors: data || [] });
 });
 
 module.exports = router;

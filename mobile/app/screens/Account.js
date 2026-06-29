@@ -193,7 +193,7 @@ export default function Account({ navigation }) {
             <View style={styles.planFree}>
               <View style={styles.planRow}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.planStatus}>Free Plan</Text>
+                  <Text style={styles.planStatusFree}>Free Plan</Text>
                   <Text style={styles.planUsage}>
                     {user?.bio_count || 0} of {user?.free_limit || 3} free bios used
                   </Text>
@@ -396,6 +396,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   planRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   planStatus: { fontSize: 16, fontWeight: '700', color: '#fff', marginBottom: 2 },
+  planStatusFree: { fontSize: 16, fontWeight: '700', color: C.textPrimary, marginBottom: 2 },
   planRenewal: { fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 2 },
   planUsage: { fontSize: 13, color: C.textMuted, marginTop: 4 },
   upgradeChip: { borderRadius: 10, overflow: 'hidden' },

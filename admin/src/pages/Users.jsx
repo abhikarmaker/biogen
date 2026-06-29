@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import DataTable from '../components/DataTable';
 import { getUsers, updateUserPlan, deleteUser } from '../lib/api';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 
 function PlanBadge({ plan }) {
   return (
@@ -80,12 +80,6 @@ export default function Users() {
     { key: 'email', label: 'Email', render: (r) => <span className="text-white">{r.email}</span> },
     { key: 'plan', label: 'Plan', render: (r) => <PlanBadge plan={r.plan} /> },
     { key: 'bio_count', label: 'Bios', render: (r) => <span className="text-gray-300">{r.bio_count ?? 0}</span> },
-    {
-      key: 'last_active_at', label: 'Last active',
-      render: (r) => r.last_active_at
-        ? <span className="text-gray-400">{formatDistanceToNow(new Date(r.last_active_at), { addSuffix: true })}</span>
-        : <span className="text-gray-600">—</span>,
-    },
     {
       key: 'created_at', label: 'Joined',
       render: (r) => r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : '—',
