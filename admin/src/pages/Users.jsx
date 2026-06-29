@@ -1,7 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import DataTable from '../components/DataTable';
 import { getUsers, updateUserPlan, deleteUser } from '../lib/api';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
+
+function PlanBadge({ plan }) {
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${
+      plan === 'pro' ? 'bg-accent/20 text-accent' : 'bg-gray-700 text-gray-300'
+    }`}>
+      {plan?.toUpperCase()}
+    </span>
+  );
+}
 
 function PlanToggle({ user, onToggle }) {
   const [loading, setLoading] = useState(false);
@@ -59,21 +69,30 @@ export default function Users() {
   const [plan, setPlan] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const handleToggle = (id, newPlan) => setRows((prev) => prev.map((r) => r.id === id ? { ...r, plan: newPlan } : r));
-  const handleDelete = (id) => { setRows((prev) => prev.filter((r) => r.id !== id)); setTotal((t) => t - 1); };
+  const handleToggle = (id, newPlan) =>
+    setRows((prev) => prev.map((r) => r.id === id ? { ...r, plan: newPlan } : r));
+  const handleDelete = (id) => {
+    setRows((prev) => prev.filter((r) => r.id !== id));
+    setTotal((t) => t - 1);
+  };
+
+  const proCount = rows.filter((r) => r.plan === 'pro').length;
+  const conversionPct = rows.length > 0 ? ((proCount / rows.length) * 100).toFixed(0) : 0;
 
   const columns = [
-    { key: 'email', label: 'Email' },
+    { key: 'email', label: 'Email', render: (r) => <span className="text-white">{r.email}</span> },
+    { key: 'plan', label: 'Plan', render: (r) => <PlanBadge plan={r.plan} /> },
+    { key: 'bio_count', label: 'Bios', render: (r) => <span className="text-gray-300">{r.bio_count ?? 0}</span> },
     {
-      key: 'plan', label: 'Plan',
-      render: (r) => (
-        <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${r.plan === 'pro' ? 'bg-accent/20 text-accent' : 'bg-gray-700 text-gray-300'}`}>
-          {r.plan?.toUpperCase()}
-        </span>
-      ),
+      key: 'last_active_at', label: 'Last active',
+      render: (r) => r.last_active_at
+        ? <span className="text-gray-400">{formatDistanceToNow(new Date(r.last_active_at), { addSuffix: true })}</span>
+        : <span className="text-gray-600">—</span>,
     },
-    { key: 'bio_count', label: 'Bios' },
-    { key: 'created_at', label: 'Joined', render: (r) => r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : '—' },
+    {
+      key: 'created_at', label: 'Joined',
+      render: (r) => r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : '—',
+    },
     {
       key: 'actions', label: '',
       render: (r) => (
@@ -88,7 +107,7 @@ export default function Users() {
   const fetchUsers = useCallback(() => {
     setLoading(true);
     getUsers({ search, plan })
-      .then((d) => { setRows(d.users); setTotal(d.total); })
+      .then((d) => { setRows(d.users || []); setTotal(d.total || 0); })
       .catch(() => { setRows([]); setTotal(0); })
       .finally(() => setLoading(false));
   }, [search, plan]);
@@ -100,9 +119,16 @@ export default function Users() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Users</h1>
-          <p className="text-sm text-gray-400">{total.toLocaleString()} total</p>
+          <p className="text-sm text-gray-400">
+            {total.toLocaleString()} total
+            {!loading && rows.length > 0 && (
+              <span className="ml-2 text-accent font-medium">{conversionPct}% Pro</span>
+            )}
+          </p>
         </div>
-        <button onClick={fetchUsers} className="text-sm text-gray-400 hover:text-white transition-colors">↻ Refresh</button>
+        <button onClick={fetchUsers} className="text-sm text-gray-400 hover:text-white transition-colors">
+          ↻ Refresh
+        </button>
       </div>
 
       <div className="flex gap-3 mb-5">
