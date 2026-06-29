@@ -11,6 +11,9 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
+// Trust Render/reverse-proxy forwarded IPs (required for rate limiter)
+app.set('trust proxy', 1);
+
 // Stripe webhooks need raw body — must be before express.json()
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
