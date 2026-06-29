@@ -10,10 +10,10 @@ const router = Router();
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  const isEmail = email === process.env.ADMIN_EMAIL;
+  const isEmail = email.trim().toLowerCase() === process.env.ADMIN_EMAIL?.trim().toLowerCase();
   const isPass = process.env.ADMIN_PASSWORD_HASH
-    ? await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH).catch(() => false)
-    : password === process.env.ADMIN_PASSWORD;
+    ? await bcrypt.compare(password.trim(), process.env.ADMIN_PASSWORD_HASH).catch(() => false)
+    : password.trim() === process.env.ADMIN_PASSWORD?.trim();
 
   if (!isEmail || !isPass) {
     return res.status(401).json({ error: 'Invalid admin credentials' });
