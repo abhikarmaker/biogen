@@ -10,6 +10,9 @@ import * as Clipboard from 'expo-clipboard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { formatDistanceToNow } from 'date-fns';
 import Colors from '../constants/colors';
+import { PLATFORMS } from '../constants/platforms';
+
+const PLATFORM_NAMES = Object.fromEntries(PLATFORMS.map((p) => [p.id, p.name]));
 
 export default function BioCard({ bio, onDelete, showDelete = false }) {
   const [expanded, setExpanded] = useState(false);
@@ -37,7 +40,7 @@ export default function BioCard({ bio, onDelete, showDelete = false }) {
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.meta}>
-          <Text style={styles.platform}>{bio.platform}</Text>
+          <Text style={styles.platform}>{PLATFORM_NAMES[bio.platform] || bio.platform}</Text>
           <Text style={styles.dot}>·</Text>
           <Text style={styles.time}>{timeAgo}</Text>
         </View>

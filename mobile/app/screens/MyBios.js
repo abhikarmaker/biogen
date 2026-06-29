@@ -48,34 +48,6 @@ export default function MyBios({ navigation }) {
     try { await deleteBio(id); } catch { /* ok in dev */ }
   };
 
-  if (!isPro) {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.lockedContainer}>
-          <LinearGradient colors={[Colors.accent, Colors.accentLight]} style={styles.lockIcon}>
-            <MaterialCommunityIcons name="lock" size={28} color="#fff" />
-          </LinearGradient>
-          <Text style={styles.lockedTitle}>Save all your bios</Text>
-          <Text style={styles.lockedSub}>Upgrade to Pro to access your full bio history</Text>
-          <TouchableOpacity
-            style={styles.upgradeBtn}
-            onPress={() => navigation.navigate('Generate', { screen: 'Paywall' })}
-            activeOpacity={0.85}
-          >
-            <LinearGradient
-              colors={[Colors.accent, Colors.accentLight]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.upgradeBtnInner}
-            >
-              <Text style={styles.upgradeBtnText}>Upgrade to Pro</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   if (loading) {
     return (
       <SafeAreaView style={styles.safe}>
@@ -90,6 +62,26 @@ export default function MyBios({ navigation }) {
         <Text style={styles.title}>My Bios</Text>
         <Text style={styles.count}>{bios.length} saved</Text>
       </View>
+
+      {/* Upgrade banner for free users */}
+      {!isPro && (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Generate', { screen: 'Paywall' })}
+          activeOpacity={0.85}
+          style={styles.upgradeBanner}
+        >
+          <LinearGradient
+            colors={[Colors.accent, Colors.accentLight]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.upgradeBannerInner}
+          >
+            <MaterialCommunityIcons name="star-circle" size={16} color="#fff" />
+            <Text style={styles.upgradeBannerText}>Upgrade to Pro to save unlimited bios</Text>
+            <MaterialCommunityIcons name="chevron-right" size={16} color="#fff" />
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
 
       {bios.length === 0 ? (
         <View style={styles.centered}>
@@ -152,11 +144,7 @@ const styles = StyleSheet.create({
   generateBtn: { borderRadius: 14, overflow: 'hidden', marginTop: 4, width: '100%' },
   generateBtnInner: { paddingVertical: 15, alignItems: 'center', borderRadius: 14 },
   generateBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },
-  lockedContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, gap: 12 },
-  lockIcon: { width: 64, height: 64, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  lockedTitle: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary },
-  lockedSub: { fontSize: 15, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22 },
-  upgradeBtn: { borderRadius: 14, overflow: 'hidden', marginTop: 8, width: '100%' },
-  upgradeBtnInner: { paddingVertical: 16, alignItems: 'center' },
-  upgradeBtnText: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  upgradeBanner: { marginHorizontal: 16, marginBottom: 8, borderRadius: 12, overflow: 'hidden' },
+  upgradeBannerInner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 11, gap: 8 },
+  upgradeBannerText: { flex: 1, fontSize: 13, fontWeight: '600', color: '#fff' },
 });

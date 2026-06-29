@@ -7,6 +7,12 @@ import {
 } from 'recharts';
 
 const PLATFORMS = ['linkedin', 'instagram', 'twitter', 'threads', 'tiktok', 'youtube', 'hinge', 'bumble', 'github', 'discord', 'reddit', 'substack'];
+const PLATFORM_NAMES = {
+  linkedin: 'LinkedIn', instagram: 'Instagram', twitter: 'X (Twitter)',
+  threads: 'Threads', tiktok: 'TikTok', youtube: 'YouTube',
+  hinge: 'Hinge', bumble: 'Bumble', github: 'GitHub',
+  discord: 'Discord', reddit: 'Reddit', substack: 'Substack',
+};
 
 function DeleteBioBtn({ id, onDelete }) {
   const [loading, setLoading] = useState(false);
@@ -45,7 +51,7 @@ export default function Bios() {
 
   const columns = [
     { key: 'email', label: 'User', render: (r) => r.users?.email || '—' },
-    { key: 'platform', label: 'Platform', render: (r) => <span className="capitalize">{r.platform}</span> },
+    { key: 'platform', label: 'Platform', render: (r) => <span>{PLATFORM_NAMES[r.platform] || r.platform}</span> },
     { key: 'tone', label: 'Tone' },
     { key: 'created_at', label: 'Date', render: (r) => r.created_at ? format(new Date(r.created_at), 'MMM d, yyyy') : '—' },
     { key: 'content', label: 'Preview', render: (r) => <span className="text-gray-400">{r.content?.slice(0, 60)}…</span> },
@@ -63,7 +69,7 @@ export default function Bios() {
   useEffect(() => { fetchBios(); }, [fetchBios]);
 
   const chartData = PLATFORMS.map((p) => ({
-    platform: p,
+    platform: PLATFORM_NAMES[p] || p,
     count: rows.filter((r) => r.platform === p).length,
   }));
 
@@ -97,7 +103,7 @@ export default function Bios() {
           className="bg-surface border border-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent transition-colors"
         >
           <option value="">All platforms</option>
-          {PLATFORMS.map((p) => <option key={p} value={p} className="capitalize">{p}</option>)}
+          {PLATFORMS.map((p) => <option key={p} value={p}>{PLATFORM_NAMES[p] || p}</option>)}
         </select>
       </div>
 
