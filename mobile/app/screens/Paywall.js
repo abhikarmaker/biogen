@@ -32,12 +32,22 @@ export default function Paywall({ navigation }) {
   const [loadingSub, setLoadingSub] = useState(false);
   const [loadingOne, setLoadingOne] = useState(false);
 
+  // Paywall can be opened from other tabs (Account, My Bios) where the
+  // GenerateStack may have no prior screen. canGoBack() guards against that.
+  const dismiss = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('PlatformPicker');
+    }
+  };
+
   const handleSubscribe = async () => {
     setLoadingSub(true);
     try {
       await createSubscription({ plan: 'monthly' });
       await refreshUser();
-      navigation.goBack();
+      dismiss();
     } catch (err) {
       if (err.message?.includes('not configured')) {
         Alert.alert('Coming soon', 'Payments are not set up yet. Check back soon!');
@@ -54,7 +64,7 @@ export default function Paywall({ navigation }) {
     try {
       await createOneTimePayment({ product: 'lifetime' });
       await refreshUser();
-      navigation.goBack();
+      dismiss();
     } catch (err) {
       if (err.message?.includes('not configured')) {
         Alert.alert('Coming soon', 'Payments are not set up yet. Check back soon!');
@@ -70,7 +80,7 @@ export default function Paywall({ navigation }) {
     <SafeAreaView style={styles.safe}>
       <TouchableOpacity
         style={styles.close}
-        onPress={() => navigation.goBack()}
+        onPress={dismiss}
         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
       >
         <Ionicons name="close" size={22} color={colors.textSecondary} />
