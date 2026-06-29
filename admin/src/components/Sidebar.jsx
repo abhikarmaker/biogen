@@ -24,9 +24,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center text-xs font-bold">
-            ⚡
-          </div>
+          <img src="/favicon.svg" alt="BioGen" className="w-7 h-7 rounded-lg" />
           <span className="font-bold text-base text-white">BioGen</span>
           <span className="text-[9px] font-bold bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded">
             ADMIN

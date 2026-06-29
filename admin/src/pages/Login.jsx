@@ -33,9 +33,7 @@ export default function Login() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-10">
-          <div className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center font-bold text-lg">
-            ⚡
-          </div>
+          <img src="/favicon.svg" alt="BioGen" className="w-9 h-9 rounded-xl" />
           <span className="text-2xl font-bold text-white">BioGen</span>
           <span className="text-[10px] font-bold bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded">
             ADMIN

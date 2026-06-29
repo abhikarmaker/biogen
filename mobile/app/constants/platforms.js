@@ -85,7 +85,7 @@ export const PLATFORMS = [
     id: 'discord',
     name: 'Discord',
     type: 'Social',
-    iconName: 'discord',
+    iconName: 'forum',
     color: '#5865F2',
     gradientColors: ['#7289DA', '#5865F2'],
     charLimit: 190,

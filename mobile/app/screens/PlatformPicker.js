@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
   Platform,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -95,14 +96,10 @@ export default function PlatformPicker({ navigation }) {
       {/* ── Header ─────────────────────────────────── */}
       <View style={styles.header}>
         <View style={styles.logoRow}>
-          <LinearGradient
-            colors={[Colors.accent, Colors.accentLight]}
+          <Image
+            source={require('../../assets/icon.png')}
             style={styles.logoMark}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <MaterialCommunityIcons name="lightning-bolt" size={16} color="#fff" />
-          </LinearGradient>
+          />
           <Text style={styles.logoText}>BioGen</Text>
           {isPro && (
             <LinearGradient
@@ -199,8 +196,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   logoText: {
     fontSize: 18,
