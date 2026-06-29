@@ -12,7 +12,7 @@ import { generateBio } from '../services/api';
 import { useUser } from '../context/UserContext';
 
 function buildMockBio({ platform, role, interests, tone, length }) {
-  const charLimits = { linkedin: 2600, instagram: 150, twitter: 160, hinge: 300, bumble: 300, tiktok: 80 };
+  const charLimits = { linkedin: 2600, instagram: 150, twitter: 160, threads: 150, hinge: 300, bumble: 300, tiktok: 80, youtube: 1000, github: 160, discord: 190, reddit: 200, substack: 280 };
   const limit = charLimits[platform] || 300;
 
   const interestList = interests
@@ -65,6 +65,48 @@ function buildMockBio({ platform, role, interests, tone, length }) {
       Witty: `${role} obsessed with ${first} 😅`,
       Bold: `${role}. ${first}. No filter.`,
       Minimal: `${role} · ${first}`,
+    },
+    threads: {
+      Friendly: `${role}. Into ${first}${others ? ` and ${others}` : ''}. Here to share things worth reading.`,
+      Professional: `${role} | ${first}${others ? ` | ${others}` : ''} | Thoughts worth having.`,
+      Witty: `${role}. Professionally into ${first}. Accidentally on Threads.${others ? ` Also ${others}.` : ''}`,
+      Bold: `${role}. ${first} obsessive. Opinions unfiltered.`,
+      Minimal: `${role}. ${first}.`,
+    },
+    youtube: {
+      Friendly: `${role} sharing everything I know about ${first}${others ? ` and ${others}` : ''}. New videos every week — subscribe if you're into that kind of thing.`,
+      Professional: `${role} | Content about ${first}${others ? ` and ${others}` : ''} | Helping people learn what took me years to figure out.`,
+      Witty: `${role} who makes videos about ${first}${others ? ` and occasionally ${others}` : ''}. Subscribe if you want — no pressure, but also subscribe.`,
+      Bold: `${role}. I make videos about ${first}${others ? ` and ${others}` : ''}. No fluff, no filler. Just the good stuff.`,
+      Minimal: `${role}. Videos about ${first}${others ? ` and ${others}` : ''}.`,
+    },
+    github: {
+      Friendly: `${role} who loves ${first}${others ? ` and ${others}` : ''}. Building in public and learning every day.`,
+      Professional: `${role} | Focused on ${first}${others ? ` and ${others}` : ''} | Open source contributor`,
+      Witty: `${role}. Into ${first}${others ? ` and ${others}` : ''}. My commit messages are better than my bios.`,
+      Bold: `${role}. Building with ${first}${others ? ` and ${others}` : ''}. Ship fast, learn faster.`,
+      Minimal: `${role}. ${first}.`,
+    },
+    discord: {
+      Friendly: `${role} | Love ${first}${others ? ` + ${others}` : ''} | Always down to chat 👋`,
+      Professional: `${role} | ${first}${others ? ` | ${others}` : ''} | DMs open`,
+      Witty: `${role} by day, ${first} enthusiast by night.${others ? ` ${others} too.` : ''} Ping me.`,
+      Bold: `${role}. ${first}.${others ? ` ${others}.` : ''} No small talk.`,
+      Minimal: `${role} · ${first}`,
+    },
+    reddit: {
+      Friendly: `${role} who spends too much time thinking about ${first}${others ? ` and ${others}` : ''}. Here to learn and share.`,
+      Professional: `${role} | Interested in ${first}${others ? ` and ${others}` : ''} | Longtime lurker, occasional poster`,
+      Witty: `${role}. Passionate about ${first}${others ? ` and ${others}` : ''}. My post history is a cry for help.`,
+      Bold: `${role}. ${first} enthusiast. Hot takes and good threads only.`,
+      Minimal: `${role}. Into ${first}.`,
+    },
+    substack: {
+      Friendly: `${role} writing about ${first}${others ? ` and ${others}` : ''}. I send one email a week — no fluff, just things worth your time.`,
+      Professional: `${role} | Writing about ${first}${others ? ` and ${others}` : ''} | Helping readers think more clearly about the things that matter.`,
+      Witty: `${role} who turned ${first}${others ? ` and ${others}` : ''} into a newsletter because apparently that's what we do now.`,
+      Bold: `${role}. I write about ${first}${others ? ` and ${others}` : ''}. Subscribe if you want ideas that actually change how you think.`,
+      Minimal: `${role}. Writing about ${first}${others ? ` and ${others}` : ''}.`,
     },
   };
 

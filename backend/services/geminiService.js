@@ -6,9 +6,15 @@ const CHAR_LIMITS = {
   linkedin: 2600,
   instagram: 150,
   twitter: 160,
+  threads: 150,
   hinge: 300,
   bumble: 300,
   tiktok: 80,
+  youtube: 1000,
+  github: 160,
+  discord: 190,
+  reddit: 200,
+  substack: 280,
 };
 
 const LENGTH_GUIDANCE = {

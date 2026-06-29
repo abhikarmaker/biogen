@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '../constants/colors';
@@ -39,7 +40,11 @@ export default function PlatformCard({ platform, isSelected, onPress }) {
         end={{ x: 1, y: 1 }}
         style={styles.iconWrap}
       >
-        <MaterialCommunityIcons name={platform.iconName} size={26} color="#fff" />
+        {platform.iconText ? (
+          <Text style={styles.iconText}>{platform.iconText}</Text>
+        ) : (
+          <MaterialCommunityIcons name={platform.iconName} size={26} color="#fff" />
+        )}
       </LinearGradient>
 
       {/* Name */}
@@ -134,5 +139,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 9,
     right: 9,
+  },
+  iconText: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: -1,
   },
 });
