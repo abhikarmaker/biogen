@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 
-const PLATFORMS = ['linkedin', 'instagram', 'twitter', 'hinge', 'bumble', 'tiktok'];
+const PLATFORMS = ['linkedin', 'instagram', 'twitter', 'threads', 'tiktok', 'youtube', 'hinge', 'bumble', 'github', 'discord', 'reddit', 'substack'];
 
 function DeleteBioBtn({ id, onDelete }) {
   const [loading, setLoading] = useState(false);
