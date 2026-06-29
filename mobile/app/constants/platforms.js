@@ -1,0 +1,58 @@
+export const PLATFORMS = [
+  {
+    id: 'linkedin',
+    name: 'LinkedIn',
+    type: 'Professional',
+    iconName: 'linkedin',
+    color: '#0A66C2',
+    gradientColors: ['#0A66C2', '#064799'],
+    charLimit: 2600,
+  },
+  {
+    id: 'hinge',
+    name: 'Hinge',
+    type: 'Dating',
+    iconName: 'heart-multiple',
+    color: '#E63950',
+    gradientColors: ['#E63950', '#B02E40'],
+    charLimit: 300,
+  },
+  {
+    id: 'instagram',
+    name: 'Instagram',
+    type: 'Social',
+    iconName: 'instagram',
+    color: '#E1306C',
+    gradientColors: ['#F77737', '#E1306C', '#833AB4'],
+    charLimit: 150,
+  },
+  {
+    id: 'twitter',
+    name: 'Twitter / X',
+    type: 'Social',
+    iconName: 'twitter',
+    color: '#1DA1F2',
+    gradientColors: ['#1DA1F2', '#0D8BD9'],
+    charLimit: 160,
+  },
+  {
+    id: 'bumble',
+    name: 'Bumble',
+    type: 'Dating',
+    iconName: 'bee',
+    color: '#FFC629',
+    gradientColors: ['#FFD43B', '#FFC629'],
+    charLimit: 300,
+  },
+  {
+    id: 'tiktok',
+    name: 'TikTok',
+    type: 'Social',
+    iconName: 'music-note',
+    color: '#FF0050',
+    gradientColors: ['#25F4EE', '#FE2C55'],
+    charLimit: 80,
+  },
+];
+
+export const PLATFORM_BY_ID = Object.fromEntries(PLATFORMS.map((p) => [p.id, p]));

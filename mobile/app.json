@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "BioGen",
+    "slug": "biogen",
+    "version": "1.0.0",
+    "scheme": "biogen",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#080811",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#080811"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.biogen.app",
+      "buildNumber": "1"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#080811"
+      },
+      "package": "com.biogen.app",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.biogen.app",
+          "enableGooglePay": false
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "Allow BioGen to access Face ID for secure authentication."
+        }
+      ],
+      "expo-font"
+    ]
+  }
+}
