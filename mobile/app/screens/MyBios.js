@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,13 +11,15 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Colors from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import BioCard from '../components/BioCard';
 import { getBioHistory, deleteBio } from '../services/api';
 import { useUser } from '../context/UserContext';
 
 export default function MyBios({ navigation }) {
   const { isPro, savedBios, removeBio } = useUser();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const savedBiosRef = useRef(savedBios);
   useEffect(() => { savedBiosRef.current = savedBios; }, [savedBios]);
 
@@ -51,7 +53,7 @@ export default function MyBios({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.safe}>
-        <ActivityIndicator style={{ flex: 1 }} color={Colors.accent} />
+        <ActivityIndicator style={{ flex: 1 }} color={colors.accent} />
       </SafeAreaView>
     );
   }
@@ -63,7 +65,6 @@ export default function MyBios({ navigation }) {
         <Text style={styles.count}>{bios.length} saved</Text>
       </View>
 
-      {/* Upgrade banner for free users */}
       {!isPro && (
         <TouchableOpacity
           onPress={() => navigation.navigate('Generate', { screen: 'Paywall' })}
@@ -71,7 +72,7 @@ export default function MyBios({ navigation }) {
           style={styles.upgradeBanner}
         >
           <LinearGradient
-            colors={[Colors.accent, Colors.accentLight]}
+            colors={[colors.accent, colors.accentLight]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.upgradeBannerInner}
@@ -85,7 +86,7 @@ export default function MyBios({ navigation }) {
 
       {bios.length === 0 ? (
         <View style={styles.centered}>
-          <MaterialCommunityIcons name="bookmark-outline" size={48} color={Colors.textMuted} />
+          <MaterialCommunityIcons name="bookmark-outline" size={48} color={colors.textMuted} />
           <Text style={styles.emptyTitle}>No bios yet</Text>
           <Text style={styles.emptySub}>Generate your first bio and it'll appear here</Text>
           <TouchableOpacity
@@ -94,7 +95,7 @@ export default function MyBios({ navigation }) {
             activeOpacity={0.85}
           >
             <LinearGradient
-              colors={[Colors.accent, Colors.accentLight]}
+              colors={[colors.accent, colors.accentLight]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.generateBtnInner}
@@ -116,7 +117,7 @@ export default function MyBios({ navigation }) {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => { setRefreshing(true); fetchBios(true); }}
-              tintColor={Colors.accent}
+              tintColor={colors.accent}
             />
           }
         />
@@ -125,8 +126,8 @@ export default function MyBios({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
+const makeStyles = (C) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: C.background },
   header: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -135,12 +136,12 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
   },
-  title: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary },
-  count: { fontSize: 14, color: Colors.textMuted },
+  title: { fontSize: 24, fontWeight: '700', color: C.textPrimary },
+  count: { fontSize: 14, color: C.textMuted },
   list: { paddingHorizontal: 16, paddingBottom: 24 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary },
-  emptySub: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: C.textPrimary },
+  emptySub: { fontSize: 14, color: C.textSecondary, textAlign: 'center', lineHeight: 20 },
   generateBtn: { borderRadius: 14, overflow: 'hidden', marginTop: 4, width: '100%' },
   generateBtnInner: { paddingVertical: 15, alignItems: 'center', borderRadius: 14 },
   generateBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },

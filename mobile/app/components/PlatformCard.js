@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,22 +6,24 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Colors from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
-// 2 columns, 16px outer padding each side, 8px gap between cards
 export const CARD_SIZE = (width - 32 - 8) / 2;
 
-const TYPE_META = {
-  Professional: { color: Colors.platformProfessional, label: 'Professional' },
-  Dating:       { color: Colors.platformDating,        label: 'Dating' },
-  Social:       { color: Colors.platformSocial,        label: 'Social' },
-};
-
 export default function PlatformCard({ platform, isSelected, onPress }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
+  const TYPE_META = {
+    Professional: { color: colors.platformProfessional, label: 'Professional' },
+    Dating:       { color: colors.platformDating,        label: 'Dating' },
+    Social:       { color: colors.platformSocial,        label: 'Social' },
+    Creative:     { color: colors.platformCreative,      label: 'Creative' },
+  };
+
   const typeMeta = TYPE_META[platform.type] || TYPE_META.Social;
 
   return (
@@ -30,10 +32,8 @@ export default function PlatformCard({ platform, isSelected, onPress }) {
       onPress={onPress}
       activeOpacity={0.75}
     >
-      {/* Glow overlay when selected */}
       {isSelected && <View style={styles.glow} pointerEvents="none" />}
 
-      {/* Icon circle */}
       <LinearGradient
         colors={platform.gradientColors}
         start={{ x: 0, y: 0 }}
@@ -47,42 +47,31 @@ export default function PlatformCard({ platform, isSelected, onPress }) {
         )}
       </LinearGradient>
 
-      {/* Name */}
-      <Text style={styles.name} numberOfLines={1}>
-        {platform.name}
-      </Text>
+      <Text style={styles.name} numberOfLines={1}>{platform.name}</Text>
 
-      {/* Type badge */}
       <View style={[styles.badge, { backgroundColor: `${typeMeta.color}22` }]}>
         <View style={[styles.badgeDot, { backgroundColor: typeMeta.color }]} />
-        <Text style={[styles.badgeText, { color: typeMeta.color }]}>
-          {typeMeta.label}
-        </Text>
+        <Text style={[styles.badgeText, { color: typeMeta.color }]}>{typeMeta.label}</Text>
       </View>
 
-      {/* Selected checkmark */}
       {isSelected && (
         <View style={styles.check}>
-          <MaterialCommunityIcons
-            name="check-circle"
-            size={20}
-            color={Colors.accent}
-          />
+          <MaterialCommunityIcons name="check-circle" size={20} color={colors.accent} />
         </View>
       )}
     </TouchableOpacity>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   card: {
     width: CARD_SIZE,
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderRadius: 18,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     marginBottom: 8,
     minHeight: 148,
     justifyContent: 'center',
@@ -90,9 +79,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   cardSelected: {
-    borderColor: Colors.accent,
-    backgroundColor: '#1A1A3E',
-    shadowColor: Colors.accent,
+    borderColor: C.accent,
+    backgroundColor: C.surfaceHigh,
+    shadowColor: C.accent,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 14,
@@ -100,7 +89,7 @@ const styles = StyleSheet.create({
   },
   glow: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.accentGlow,
+    backgroundColor: C.accentGlow,
     borderRadius: 18,
   },
   iconWrap: {
@@ -111,13 +100,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
   },
-  name: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    marginBottom: 7,
-    textAlign: 'center',
-  },
+  name: { fontSize: 15, fontWeight: '700', color: C.textPrimary, marginBottom: 7, textAlign: 'center' },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -126,24 +109,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: 4,
   },
-  badgeDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-  },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  check: {
-    position: 'absolute',
-    top: 9,
-    right: 9,
-  },
-  iconText: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#fff',
-    letterSpacing: -1,
-  },
+  badgeDot: { width: 5, height: 5, borderRadius: 3 },
+  badgeText: { fontSize: 11, fontWeight: '600' },
+  check: { position: 'absolute', top: 9, right: 9 },
+  iconText: { fontSize: 22, fontWeight: '800', color: '#fff', letterSpacing: -1 },
 });

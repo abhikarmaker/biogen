@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,18 @@ import {
   Animated,
   Alert,
 } from 'react-native';
-import Colors from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { generateBio } from '../services/api';
 import { useUser } from '../context/UserContext';
 
 function buildMockBio({ platform, role, interests, tone, length }) {
-  const charLimits = { linkedin: 2600, instagram: 150, twitter: 160, threads: 150, hinge: 300, bumble: 300, tiktok: 80, youtube: 1000, github: 160, discord: 190, reddit: 200, substack: 280 };
+  const charLimits = {
+    linkedin: 2600, instagram: 150, twitter: 160, threads: 150,
+    hinge: 300, bumble: 300, tinder: 500, tiktok: 80, youtube: 1000,
+    github: 160, discord: 190, reddit: 200, substack: 280, medium: 160,
+    patreon: 250, fiverr: 600, facebook: 101, snapchat: 150, pinterest: 160,
+    telegram: 255, whatsapp: 139, spotify: 1500, twitch: 300, mastodon: 500, bereal: 100,
+  };
   const limit = charLimits[platform] || 300;
 
   const interestList = interests
@@ -59,6 +65,13 @@ function buildMockBio({ platform, role, interests, tone, length }) {
       Bold: `${role}. ${first} is my love language.${others ? ` So is ${others}.` : ''} Make the first move worth it.`,
       Minimal: `${role}. ${first}. Good vibes only.`,
     },
+    tinder: {
+      Friendly: `${role} who loves ${first}${others ? ` and ${others}` : ''}. Here for a good time and maybe something more. Let's find out.`,
+      Professional: `${role}. Into ${first}${others ? ` and ${others}` : ''}. Looking for someone who knows what they want.`,
+      Witty: `${role}. Passionate about ${first}${others ? ` and somehow ${others}` : ''}. Will probably talk about it on the first date.`,
+      Bold: `${role}. ${first}.${others ? ` ${others}.` : ''} Swipe right if you can handle it.`,
+      Minimal: `${role}. ${first}. Let's go.`,
+    },
     tiktok: {
       Friendly: `${role} | ${first} lover 🎉`,
       Professional: `${role} · ${first}`,
@@ -103,14 +116,22 @@ function buildMockBio({ platform, role, interests, tone, length }) {
     },
     substack: {
       Friendly: `${role} writing about ${first}${others ? ` and ${others}` : ''}. I send one email a week — no fluff, just things worth your time.`,
-      Professional: `${role} | Writing about ${first}${others ? ` and ${others}` : ''} | Helping readers think more clearly about the things that matter.`,
+      Professional: `${role} | Writing about ${first}${others ? ` and ${others}` : ''} | Helping readers think more clearly.`,
       Witty: `${role} who turned ${first}${others ? ` and ${others}` : ''} into a newsletter because apparently that's what we do now.`,
       Bold: `${role}. I write about ${first}${others ? ` and ${others}` : ''}. Subscribe if you want ideas that actually change how you think.`,
       Minimal: `${role}. Writing about ${first}${others ? ` and ${others}` : ''}.`,
     },
   };
 
-  const tpl = (templates[platform] || templates.instagram)[tone] || Object.values(templates[platform] || templates.instagram)[0];
+  const fallback = {
+    Friendly: `${role} who loves ${first}${others ? ` and ${others}` : ''}. Always looking to connect with interesting people.`,
+    Professional: `${role}. Focused on ${first}${others ? ` and ${others}` : ''}.`,
+    Witty: `${role}. Into ${first}${others ? ` and ${others}` : ''}. Probably overthinking it.`,
+    Bold: `${role}. ${first}.${others ? ` ${others}.` : ''} No compromises.`,
+    Minimal: `${role}. ${first}.`,
+  };
+
+  const tpl = (templates[platform] || fallback)[tone] || Object.values(templates[platform] || fallback)[0];
   return tpl.length > limit ? tpl.slice(0, limit).trimEnd() : tpl;
 }
 
@@ -133,6 +154,8 @@ async function mockGenerateBio(params) {
 export default function Loading({ navigation, route }) {
   const { platform, role, interests, tone, length } = route.params;
   const { incrementBioCount, addBio } = useUser();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const dot1 = useRef(new Animated.Value(0.4)).current;
   const dot2 = useRef(new Animated.Value(0.4)).current;
@@ -165,7 +188,6 @@ export default function Loading({ navigation, route }) {
       try {
         result = await generateBio(params);
       } catch (err) {
-        // Quota exceeded — don't fall back to mock, send user back with reset info
         if (err.code === 'FREE_LIMIT_REACHED' || err.message?.includes('limit reached')) {
           if (!cancelled) {
             let detail = 'Your quota resets in 12 hours.';
@@ -180,7 +202,6 @@ export default function Loading({ navigation, route }) {
           }
           return;
         }
-        // Backend unavailable — use local mock
         result = await mockGenerateBio(params);
       }
 
@@ -218,11 +239,11 @@ export default function Loading({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
+const makeStyles = (C) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: C.background },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
   dotRow: { flexDirection: 'row', gap: 12, marginBottom: 32 },
-  dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: Colors.accent },
-  heading: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary, textAlign: 'center', letterSpacing: -0.3, marginBottom: 10 },
-  sub: { fontSize: 15, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22 },
+  dot: { width: 14, height: 14, borderRadius: 7, backgroundColor: C.accent },
+  heading: { fontSize: 22, fontWeight: '700', color: C.textPrimary, textAlign: 'center', letterSpacing: -0.3, marginBottom: 10 },
+  sub: { fontSize: 15, color: C.textSecondary, textAlign: 'center', lineHeight: 22 },
 });

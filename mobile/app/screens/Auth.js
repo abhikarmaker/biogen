@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import Colors from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { login, register, completeGoogleLogin, loginWithApple } from '../services/auth';
 import { useUser } from '../context/UserContext';
 
@@ -29,11 +29,14 @@ const DEMO_PASS = 'demo123';
 
 export default function Auth() {
   const { login: setUser } = useUser();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [oauthLoading, setOauthLoading] = useState(null); // 'google' | 'apple' | null
+  const [oauthLoading, setOauthLoading] = useState(null);
   const [showPass, setShowPass] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
 
@@ -124,14 +127,12 @@ export default function Auth() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Logo */}
           <View style={styles.logoSection}>
             <Image source={require('../../assets/icon.png')} style={styles.logoMark} />
             <Text style={styles.logoText}>BioGen</Text>
             <Text style={styles.tagline}>AI-powered bios for every platform</Text>
           </View>
 
-          {/* OAuth buttons */}
           <View style={styles.oauthSection}>
             <TouchableOpacity
               style={styles.oauthBtn}
@@ -140,7 +141,7 @@ export default function Auth() {
               activeOpacity={0.8}
             >
               {oauthLoading === 'google' ? (
-                <ActivityIndicator size="small" color={Colors.textPrimary} />
+                <ActivityIndicator size="small" color={colors.textPrimary} />
               ) : (
                 <>
                   <MaterialCommunityIcons name="google" size={20} color="#EA4335" />
@@ -160,14 +161,12 @@ export default function Auth() {
             )}
           </View>
 
-          {/* Divider */}
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>or continue with email</Text>
             <View style={styles.dividerLine} />
           </View>
 
-          {/* Email form */}
           {!showEmailForm ? (
             <TouchableOpacity
               style={styles.emailToggleBtn}
@@ -175,7 +174,7 @@ export default function Auth() {
               activeOpacity={0.8}
               disabled={anyLoading}
             >
-              <MaterialCommunityIcons name="email-outline" size={18} color={Colors.textSecondary} />
+              <MaterialCommunityIcons name="email-outline" size={18} color={colors.textSecondary} />
               <Text style={styles.emailToggleText}>Use email & password</Text>
             </TouchableOpacity>
           ) : (
@@ -183,7 +182,7 @@ export default function Auth() {
               <TextInput
                 style={styles.input}
                 placeholder="Email address"
-                placeholderTextColor={Colors.textMuted}
+                placeholderTextColor={colors.textMuted}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -195,7 +194,7 @@ export default function Auth() {
                 <TextInput
                   style={[styles.input, styles.passInput]}
                   placeholder="Password (6+ characters)"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={colors.textMuted}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPass}
@@ -210,7 +209,7 @@ export default function Auth() {
                   <MaterialCommunityIcons
                     name={showPass ? 'eye-off' : 'eye'}
                     size={20}
-                    color={Colors.textMuted}
+                    color={colors.textMuted}
                   />
                 </TouchableOpacity>
               </View>
@@ -223,7 +222,7 @@ export default function Auth() {
               >
                 {isValid ? (
                   <LinearGradient
-                    colors={[Colors.accent, Colors.accentLight]}
+                    colors={[colors.accent, colors.accentLight]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.submitBtn}
@@ -238,7 +237,7 @@ export default function Auth() {
                   </LinearGradient>
                 ) : (
                   <View style={[styles.submitBtn, styles.submitDisabled]}>
-                    <Text style={[styles.submitText, { color: Colors.textMuted }]}>
+                    <Text style={[styles.submitText, { color: colors.textMuted }]}>
                       {mode === 'login' ? 'Sign in' : 'Create account'}
                     </Text>
                   </View>
@@ -269,77 +268,65 @@ export default function Auth() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
+const makeStyles = (C) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: C.background },
   content: { flexGrow: 1, paddingHorizontal: 24, justifyContent: 'center', paddingVertical: 32 },
-
-  // Logo
   logoSection: { alignItems: 'center', marginBottom: 44 },
   logoMark: { width: 72, height: 72, borderRadius: 20, marginBottom: 14 },
-  logoText: { fontSize: 28, fontWeight: '800', color: Colors.textPrimary, letterSpacing: -0.5 },
-  tagline: { fontSize: 15, color: Colors.textSecondary, marginTop: 6 },
-
-  // OAuth
+  logoText: { fontSize: 28, fontWeight: '800', color: C.textPrimary, letterSpacing: -0.5 },
+  tagline: { fontSize: 15, color: C.textSecondary, marginTop: 6 },
   oauthSection: { gap: 12, marginBottom: 4 },
   oauthBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     paddingVertical: 15,
     paddingHorizontal: 20,
     minHeight: 52,
   },
-  oauthText: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  oauthText: { fontSize: 15, fontWeight: '600', color: C.textPrimary },
   appleBtn: { width: '100%', height: 52 },
-
-  // Divider
   divider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 20 },
-  dividerLine: { flex: 1, height: 1, backgroundColor: Colors.border },
-  dividerText: { fontSize: 13, color: Colors.textMuted, flexShrink: 0 },
-
-  // Email toggle
+  dividerLine: { flex: 1, height: 1, backgroundColor: C.border },
+  dividerText: { fontSize: 13, color: C.textMuted, flexShrink: 0 },
   emailToggleBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     paddingVertical: 15,
   },
-  emailToggleText: { fontSize: 15, fontWeight: '600', color: Colors.textSecondary },
-
-  // Email form
+  emailToggleText: { fontSize: 15, fontWeight: '600', color: C.textSecondary },
   form: { gap: 12 },
   input: {
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: Colors.textPrimary,
+    color: C.textPrimary,
   },
   passWrap: { position: 'relative' },
   passInput: { paddingRight: 48 },
   eyeBtn: { position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' },
   submitOuter: { borderRadius: 14, overflow: 'hidden', marginTop: 4 },
   submitBtn: { paddingVertical: 17, alignItems: 'center', borderRadius: 14 },
-  submitDisabled: { backgroundColor: Colors.surface, borderWidth: 1, borderColor: Colors.border },
+  submitDisabled: { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border },
   submitText: { fontSize: 16, fontWeight: '700', color: '#fff' },
   switchMode: { paddingVertical: 8, alignItems: 'center' },
-  switchText: { fontSize: 14, color: Colors.textSecondary },
-  switchAction: { color: Colors.accent, fontWeight: '600' },
-
-  // Demo
+  switchText: { fontSize: 14, color: C.textSecondary },
+  switchAction: { color: C.accent, fontWeight: '600' },
   demoBtn: { paddingVertical: 16, alignItems: 'center', marginTop: 8 },
-  demoText: { fontSize: 13, color: Colors.textMuted },
+  demoText: { fontSize: 13, color: C.textMuted },
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,8 +13,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useUser } from '../context/UserContext';
+import { useTheme } from '../context/ThemeContext';
 import PlatformCard from '../components/PlatformCard';
-import Colors from '../constants/colors';
 import { PLATFORMS } from '../constants/platforms';
 
 const FREE_LIMIT = 3;
@@ -29,7 +29,7 @@ function formatCountdown(resetAt) {
   return `${m}m`;
 }
 
-function BioCounter({ used, limit, quotaResetsAt }) {
+function BioCounter({ used, limit, quotaResetsAt, colors }) {
   const [countdown, setCountdown] = useState(() => formatCountdown(quotaResetsAt));
 
   useEffect(() => {
@@ -39,13 +39,19 @@ function BioCounter({ used, limit, quotaResetsAt }) {
   }, [quotaResetsAt]);
 
   return (
-    <View style={styles.counterRow}>
-      <View style={styles.dots}>
+    <View style={counterStyles(colors).row}>
+      <View style={counterStyles(colors).dots}>
         {Array.from({ length: limit }).map((_, i) => (
-          <View key={i} style={[styles.dot, i < used ? styles.dotFilled : styles.dotEmpty]} />
+          <View
+            key={i}
+            style={[
+              counterStyles(colors).dot,
+              i < used ? counterStyles(colors).dotFilled : counterStyles(colors).dotEmpty,
+            ]}
+          />
         ))}
       </View>
-      <Text style={styles.counterText}>
+      <Text style={counterStyles(colors).text}>
         {used >= limit && countdown
           ? `Resets in ${countdown}`
           : `${used} of ${limit} free bios used`}
@@ -54,22 +60,30 @@ function BioCounter({ used, limit, quotaResetsAt }) {
   );
 }
 
+const counterStyles = (C) => StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 12, gap: 10 },
+  dots: { flexDirection: 'row', gap: 5 },
+  dot: { width: 8, height: 8, borderRadius: 4 },
+  dotFilled: { backgroundColor: C.accent },
+  dotEmpty: { backgroundColor: C.border },
+  text: { fontSize: 13, color: C.textSecondary },
+});
+
 export default function PlatformPicker({ navigation }) {
   const [selected, setSelected] = useState(null);
   const { user, isPro, biosUsed, freeLimit, canGenerate, quotaResetsAt } = useUser();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const handleContinue = () => {
     if (!selected) return;
-
     if (!canGenerate) {
       navigation.navigate('Paywall', { fromLimit: true });
       return;
     }
-
     navigation.navigate('AboutYou', { platform: selected });
   };
 
-  // Render each card — FlatList with numColumns=2 requires a consistent item wrapper
   const renderItem = ({ item, index }) => {
     const isRightColumn = index % 2 !== 0;
     return (
@@ -91,15 +105,11 @@ export default function PlatformPicker({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
-      {/* ── Header ─────────────────────────────────── */}
       <View style={styles.header}>
         <View style={styles.logoRow}>
-          <Image
-            source={require('../../assets/icon.png')}
-            style={styles.logoMark}
-          />
+          <Image source={require('../../assets/icon.png')} style={styles.logoMark} />
           <Text style={styles.logoText}>BioGen</Text>
           {isPro && (
             <LinearGradient
@@ -113,12 +123,9 @@ export default function PlatformPicker({ navigation }) {
           )}
         </View>
         <Text style={styles.title}>Choose your platform</Text>
-        <Text style={styles.subtitle}>
-          We'll craft a bio that fits perfectly
-        </Text>
+        <Text style={styles.subtitle}>We'll craft a bio that fits perfectly</Text>
       </View>
 
-      {/* ── Platform Grid ───────────────────────────── */}
       <FlatList
         data={PLATFORMS}
         renderItem={renderItem}
@@ -129,14 +136,16 @@ export default function PlatformPicker({ navigation }) {
         columnWrapperStyle={styles.row}
       />
 
-      {/* ── Bottom Bar ──────────────────────────────── */}
       <View style={styles.bottomBar}>
-        {/* Free counter — only show for free users */}
         {!isPro && (
-          <BioCounter used={biosUsed} limit={freeLimit || FREE_LIMIT} quotaResetsAt={quotaResetsAt} />
+          <BioCounter
+            used={biosUsed}
+            limit={freeLimit || FREE_LIMIT}
+            quotaResetsAt={quotaResetsAt}
+            colors={colors}
+          />
         )}
 
-        {/* CTA button */}
         <TouchableOpacity
           onPress={handleContinue}
           disabled={!selected}
@@ -145,7 +154,7 @@ export default function PlatformPicker({ navigation }) {
         >
           {selected && canGenerate ? (
             <LinearGradient
-              colors={[Colors.accent, Colors.accentLight]}
+              colors={[colors.accent, colors.accentLight]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.cta}
@@ -174,119 +183,33 @@ export default function PlatformPicker({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-
-  // Header
+const makeStyles = (C) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: C.background },
   header: {
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'android' ? 20 : 12,
     paddingBottom: 8,
   },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 18,
-    gap: 8,
-  },
-  logoMark: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-  },
-  logoText: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-    letterSpacing: -0.3,
-  },
-  proBadge: {
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 6,
-    marginLeft: 2,
-  },
-  proBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#1A1000',
-    letterSpacing: 0.8,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    letterSpacing: -0.4,
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-  },
-
-  // Grid
-  grid: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 8,
-  },
-  row: {
-    justifyContent: 'space-between',
-  },
-  cardWrapper: {
-    flex: 1,
-    marginRight: 4,
-  },
-  cardRight: {
-    marginRight: 0,
-    marginLeft: 4,
-  },
-
-  // Bottom
+  logoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 18, gap: 8 },
+  logoMark: { width: 28, height: 28, borderRadius: 8 },
+  logoText: { fontSize: 18, fontWeight: '800', color: C.textPrimary, letterSpacing: -0.3 },
+  proBadge: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, marginLeft: 2 },
+  proBadgeText: { fontSize: 9, fontWeight: '800', color: '#1A1000', letterSpacing: 0.8 },
+  title: { fontSize: 26, fontWeight: '700', color: C.textPrimary, letterSpacing: -0.4, marginBottom: 6 },
+  subtitle: { fontSize: 15, color: C.textSecondary, lineHeight: 22 },
+  grid: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
+  row: { justifyContent: 'space-between' },
+  cardWrapper: { flex: 1, marginRight: 4 },
+  cardRight: { marginRight: 0, marginLeft: 4 },
   bottomBar: {
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: Platform.OS === 'android' ? 16 : 10,
-    backgroundColor: Colors.background,
+    backgroundColor: C.background,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderTopColor: C.border,
   },
-  counterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    gap: 10,
-  },
-  dots: {
-    flexDirection: 'row',
-    gap: 5,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  dotFilled: {
-    backgroundColor: Colors.accent,
-  },
-  dotEmpty: {
-    backgroundColor: Colors.border,
-  },
-  counterText: {
-    fontSize: 13,
-    color: Colors.textSecondary,
-  },
-
-  // CTA button
-  ctaOuter: {
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
+  ctaOuter: { borderRadius: 14, overflow: 'hidden' },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -300,23 +223,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 17,
     paddingHorizontal: 24,
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: C.border,
   },
-  ctaText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: -0.2,
-  },
-  ctaTextDisabled: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: Colors.textMuted,
-  },
-  ctaIcon: {
-    marginLeft: 2,
-  },
+  ctaText: { fontSize: 16, fontWeight: '700', color: '#FFFFFF', letterSpacing: -0.2 },
+  ctaTextDisabled: { fontSize: 15, fontWeight: '500', color: C.textMuted },
+  ctaIcon: { marginLeft: 2 },
 });

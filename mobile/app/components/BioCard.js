@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,12 +9,15 @@ import {
 import * as Clipboard from 'expo-clipboard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { formatDistanceToNow } from 'date-fns';
-import Colors from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import { PLATFORMS } from '../constants/platforms';
 
 const PLATFORM_NAMES = Object.fromEntries(PLATFORMS.map((p) => [p.id, p.name]));
 
 export default function BioCard({ bio, onDelete, showDelete = false }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -49,12 +52,12 @@ export default function BioCard({ bio, onDelete, showDelete = false }) {
             <MaterialCommunityIcons
               name={copied ? 'check' : 'content-copy'}
               size={16}
-              color={copied ? Colors.success : Colors.textMuted}
+              color={copied ? colors.success : colors.textMuted}
             />
           </TouchableOpacity>
           {showDelete && (
             <TouchableOpacity onPress={handleDelete} style={styles.actionBtn}>
-              <MaterialCommunityIcons name="trash-can-outline" size={16} color={Colors.textMuted} />
+              <MaterialCommunityIcons name="trash-can-outline" size={16} color={colors.textMuted} />
             </TouchableOpacity>
           )}
         </View>
@@ -71,56 +74,23 @@ export default function BioCard({ bio, onDelete, showDelete = false }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderRadius: 14,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: C.border,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  meta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  platform: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.accentLight,
-  },
-  dot: {
-    color: Colors.textMuted,
-  },
-  time: {
-    fontSize: 12,
-    color: Colors.textMuted,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionBtn: {
-    padding: 4,
-  },
-  content: {
-    fontSize: 14,
-    color: Colors.textPrimary,
-    lineHeight: 21,
-  },
-  expandBtn: {
-    marginTop: 8,
-  },
-  expandText: {
-    fontSize: 13,
-    color: Colors.accent,
-    fontWeight: '500',
-  },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  platform: { fontSize: 13, fontWeight: '600', color: C.accentLight },
+  dot: { color: C.textMuted },
+  time: { fontSize: 12, color: C.textMuted },
+  actions: { flexDirection: 'row', gap: 8 },
+  actionBtn: { padding: 4 },
+  content: { fontSize: 14, color: C.textPrimary, lineHeight: 21 },
+  expandBtn: { marginTop: 8 },
+  expandText: { fontSize: 13, color: C.accent, fontWeight: '500' },
 });

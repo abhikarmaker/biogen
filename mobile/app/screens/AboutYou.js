@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import TonePill from '../components/TonePill';
-import Colors from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 
 const TONES = [
   'Friendly', 'Professional', 'Witty', 'Bold', 'Minimal',
@@ -31,10 +31,23 @@ const ROLE_PLACEHOLDERS = {
   youtube:   'e.g. Tech reviewer & DIY enthusiast',
   hinge:     'e.g. Nurse who loves the outdoors',
   bumble:    'e.g. Marketing manager by day, chef by night',
+  tinder:    'e.g. Architect who surfs on weekends',
   github:    'e.g. Full-stack engineer & open source contributor',
   discord:   'e.g. Game developer & community builder',
   reddit:    'e.g. Data scientist & hobby photographer',
   substack:  'e.g. Journalist covering climate & tech',
+  medium:    'e.g. Writer exploring ideas at the edge of tech and culture',
+  patreon:   'e.g. Illustrator & storyteller helping creators build their world',
+  fiverr:    'e.g. Brand designer helping startups find their visual voice',
+  facebook:  'e.g. Local business owner & community organizer',
+  snapchat:  'e.g. Creative director & everyday adventurer',
+  pinterest: 'e.g. Interior designer & slow living enthusiast',
+  telegram:  'e.g. Crypto analyst & tech commentator',
+  whatsapp:  'e.g. Personal trainer sharing daily wellness tips',
+  spotify:   'e.g. Indie singer-songwriter exploring lo-fi and dream pop',
+  twitch:    'e.g. FPS gamer & variety streamer, live every weeknight',
+  mastodon:  'e.g. Open-source developer & digital rights advocate',
+  bereal:    'e.g. Architecture student & weekend skater',
 };
 
 const INTEREST_SUGGESTIONS = {
@@ -46,16 +59,31 @@ const INTEREST_SUGGESTIONS = {
   youtube:   ['Tech reviews', 'Gaming', 'Cooking', 'Travel vlogs', 'Tutorials', 'Music', 'Fitness'],
   hinge:     ['Hiking', 'Cooking', 'Travel', 'Reading', 'Coffee', 'Music', 'Yoga', 'Dogs', 'Wine'],
   bumble:    ['Brunch', 'Concerts', 'Gym', 'Travel', 'Board games', 'Cooking', 'Movies', 'Coffee'],
+  tinder:    ['Spontaneous trips', 'Good food', 'Live music', 'Sunsets', 'Gym', 'Cooking', 'Movies', 'Hiking'],
   github:    ['Open source', 'Web dev', 'AI/ML', 'DevOps', 'Mobile apps', 'Game dev', 'Security'],
   discord:   ['Gaming', 'Anime', 'Programming', 'Music', 'Art', 'Crypto', 'Streaming'],
   reddit:    ['Gaming', 'Science', 'Movies', 'Books', 'Sports', 'Cooking', 'Photography', 'Tech'],
   substack:  ['Writing', 'Journalism', 'Politics', 'Tech', 'Culture', 'Economics', 'History'],
+  medium:    ['Self-improvement', 'Startups', 'Philosophy', 'Technology', 'Mental health', 'Creativity', 'Science'],
+  patreon:   ['Illustration', 'Comics', 'Music', 'Podcasting', 'Filmmaking', 'Writing', 'Photography', 'Art'],
+  fiverr:    ['Brand design', 'Copywriting', 'Web design', 'Motion graphics', 'SEO', 'Video editing', 'Illustration'],
+  facebook:  ['Community', 'Family', 'Local events', 'Business', 'Cooking', 'Travel', 'Sports', 'DIY'],
+  snapchat:  ['Streetwear', 'Travel', 'Food', 'Music', 'Comedy', 'Fitness', 'Art', 'Night life'],
+  pinterest: ['Interior design', 'Fashion', 'Recipes', 'Travel', 'Minimalism', 'DIY', 'Gardening', 'Wedding'],
+  telegram:  ['Crypto', 'News', 'Technology', 'Finance', 'Politics', 'Science', 'Privacy', 'Gaming'],
+  whatsapp:  ['Fitness', 'Nutrition', 'Mindfulness', 'Travel', 'Cooking', 'Parenting', 'Business tips'],
+  spotify:   ['Songwriting', 'Lo-fi', 'Indie', 'Guitar', 'Production', 'Jazz', 'Folk', 'Electronic'],
+  twitch:    ['FPS games', 'RPGs', 'Speedrunning', 'Retro gaming', 'IRL', 'Cooking streams', 'Music', 'Art'],
+  mastodon:  ['Open source', 'Linux', 'Privacy', 'Decentralization', 'Tech ethics', 'Photography', 'Writing'],
+  bereal:    ['Photography', 'Architecture', 'Skating', 'Street food', 'Coffee', 'Concerts', 'Film', 'Nature'],
 };
 
 const DEFAULT_SUGGESTIONS = ['Reading', 'Travel', 'Music', 'Fitness', 'Cooking', 'Photography', 'Gaming', 'Coffee'];
 
 export default function AboutYou({ navigation, route }) {
   const { platform } = route.params;
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [role, setRole] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
@@ -105,7 +133,7 @@ export default function AboutYou({ navigation, route }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -117,7 +145,7 @@ export default function AboutYou({ navigation, route }) {
             style={styles.backBtn}
             hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
           >
-            <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
+            <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
           </TouchableOpacity>
           <View>
             <Text style={styles.title}>Tell us about you</Text>
@@ -136,7 +164,7 @@ export default function AboutYou({ navigation, route }) {
             <TextInput
               style={styles.input}
               placeholder={ROLE_PLACEHOLDERS[platform.id] || 'e.g. Product designer at a startup'}
-              placeholderTextColor={Colors.textMuted}
+              placeholderTextColor={colors.textMuted}
               value={role}
               onChangeText={setRole}
               returnKeyType="next"
@@ -159,7 +187,7 @@ export default function AboutYou({ navigation, route }) {
                     activeOpacity={0.7}
                   >
                     <LinearGradient
-                      colors={[Colors.accent, Colors.accentLight]}
+                      colors={[colors.accent, colors.accentLight]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={styles.selectedTagInner}
@@ -177,7 +205,7 @@ export default function AboutYou({ navigation, route }) {
               <TextInput
                 style={styles.tagInput}
                 placeholder="Add your own (comma to add)..."
-                placeholderTextColor={Colors.textMuted}
+                placeholderTextColor={colors.textMuted}
                 value={tagInput}
                 onChangeText={handleTagInputChange}
                 onSubmitEditing={commitTagInput}
@@ -186,7 +214,7 @@ export default function AboutYou({ navigation, route }) {
               />
               {tagInput.trim().length > 0 && (
                 <TouchableOpacity onPress={commitTagInput} style={styles.tagAddBtn}>
-                  <MaterialCommunityIcons name="plus-circle" size={22} color={Colors.accent} />
+                  <MaterialCommunityIcons name="plus-circle" size={22} color={colors.accent} />
                 </TouchableOpacity>
               )}
             </View>
@@ -245,7 +273,7 @@ export default function AboutYou({ navigation, route }) {
           >
             {canGenerate ? (
               <LinearGradient
-                colors={[Colors.accent, Colors.accentLight]}
+                colors={[colors.accent, colors.accentLight]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.generateBtn}
@@ -255,7 +283,7 @@ export default function AboutYou({ navigation, route }) {
               </LinearGradient>
             ) : (
               <View style={[styles.generateBtn, styles.generateDisabled]}>
-                <Text style={[styles.generateText, { color: Colors.textMuted }]}>
+                <Text style={[styles.generateText, { color: colors.textMuted }]}>
                   {!role.trim() ? 'Tell us what you do first' : 'Add at least one interest'}
                 </Text>
               </View>
@@ -267,8 +295,8 @@ export default function AboutYou({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
+const makeStyles = (C) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: C.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -278,137 +306,67 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   backBtn: { padding: 4 },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginTop: 2,
-  },
-  scroll: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-  },
+  title: { fontSize: 22, fontWeight: '700', color: C.textPrimary, letterSpacing: -0.3 },
+  subtitle: { fontSize: 14, color: C.textSecondary, marginTop: 2 },
+  scroll: { paddingHorizontal: 20, paddingTop: 12 },
   field: { marginBottom: 22 },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginBottom: 8,
-    letterSpacing: 0.2,
-  },
+  label: { fontSize: 14, fontWeight: '600', color: C.textSecondary, marginBottom: 8, letterSpacing: 0.2 },
   input: {
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontSize: 15,
-    color: Colors.textPrimary,
+    color: C.textPrimary,
   },
-
-  // Selected tags
-  selectedTags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 10,
-  },
+  selectedTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 },
   selectedTag: { borderRadius: 20, overflow: 'hidden' },
-  selectedTagInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    gap: 5,
-  },
+  selectedTagInner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 7, gap: 5 },
   selectedTagText: { fontSize: 13, fontWeight: '600', color: '#fff' },
-
-  // Custom tag input
   tagInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     paddingHorizontal: 14,
     marginBottom: 14,
   },
-  tagInput: {
-    flex: 1,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: Colors.textPrimary,
-  },
+  tagInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: C.textPrimary },
   tagAddBtn: { paddingLeft: 6 },
-
-  // Suggestions
   suggestLabel: {
     fontSize: 12,
     fontWeight: '500',
-    color: Colors.textMuted,
+    color: C.textMuted,
     marginBottom: 8,
     letterSpacing: 0.3,
     textTransform: 'uppercase',
   },
-  suggestions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
+  suggestions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   suggestionTag: {
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 20,
-    backgroundColor: Colors.surface,
+    backgroundColor: C.surface,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
   },
-  suggestionTagSelected: {
-    borderColor: Colors.accent,
-    backgroundColor: Colors.accent + '22',
-  },
-  suggestionTagText: { fontSize: 13, color: Colors.textSecondary },
-  suggestionTagTextSelected: { color: Colors.accent, fontWeight: '600' },
-
-  // Tone / Length pills
-  pills: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-
-  // Footer
+  suggestionTagSelected: { borderColor: C.accent, backgroundColor: C.accent + '22' },
+  suggestionTagText: { fontSize: 13, color: C.textSecondary },
+  suggestionTagTextSelected: { color: C.accent, fontWeight: '600' },
+  pills: { flexDirection: 'row', flexWrap: 'wrap' },
   footer: {
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: Platform.OS === 'android' ? 16 : 10,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderTopColor: C.border,
   },
   generateOuter: { borderRadius: 14, overflow: 'hidden' },
-  generateBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 17,
-    gap: 8,
-  },
-  generateDisabled: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 14,
-  },
-  generateText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: -0.2,
-  },
+  generateBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 17, gap: 8 },
+  generateDisabled: { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 14 },
+  generateText: { fontSize: 16, fontWeight: '700', color: '#fff', letterSpacing: -0.2 },
 });

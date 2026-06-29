@@ -1,4 +1,16 @@
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const AVATAR_KEY = 'biogen_avatar_uri';
+const DISPLAY_NAME_KEY = 'biogen_display_name';
+
+export const saveAvatarUri = (uri) => AsyncStorage.setItem(AVATAR_KEY, uri);
+export const getAvatarUri = () => AsyncStorage.getItem(AVATAR_KEY);
+export const removeAvatarUri = () => AsyncStorage.removeItem(AVATAR_KEY);
+
+export const saveDisplayName = (name) => AsyncStorage.setItem(DISPLAY_NAME_KEY, name);
+export const getDisplayName = () => AsyncStorage.getItem(DISPLAY_NAME_KEY);
+export const removeDisplayName = () => AsyncStorage.removeItem(DISPLAY_NAME_KEY);
 
 const TOKEN_KEY = 'biogen_token';
 const USER_KEY = 'biogen_user';

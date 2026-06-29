@@ -17,4 +17,5 @@ export default {
   platformProfessional: '#4ADE80',
   platformDating: '#F87171',
   platformSocial: '#60A5FA',
+  platformCreative: '#E879F9',
 };

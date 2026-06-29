@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import Colors from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 
 export default function TonePill({ label, isSelected, onPress }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <TouchableOpacity
       style={[styles.pill, isSelected && styles.pillSelected]}
@@ -16,28 +19,21 @@ export default function TonePill({ label, isSelected, onPress }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (C) => StyleSheet.create({
   pill: {
     paddingHorizontal: 16,
     paddingVertical: 9,
     borderRadius: 50,
     borderWidth: 1.5,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
+    borderColor: C.border,
+    backgroundColor: C.surface,
     marginRight: 8,
     marginBottom: 8,
   },
   pillSelected: {
-    borderColor: Colors.accent,
-    backgroundColor: Colors.accentGlow,
+    borderColor: C.accent,
+    backgroundColor: C.accentGlow,
   },
-  label: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: Colors.textSecondary,
-  },
-  labelSelected: {
-    color: Colors.accentLight,
-    fontWeight: '600',
-  },
+  label: { fontSize: 13, fontWeight: '500', color: C.textSecondary },
+  labelSelected: { color: C.accentLight, fontWeight: '600' },
 });

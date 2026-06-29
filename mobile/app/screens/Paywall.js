@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import Colors from '../constants/colors';
+import { useTheme } from '../context/ThemeContext';
 import ProBadge from '../components/ProBadge';
 import { createSubscription, createOneTimePayment } from '../services/api';
 import { useUser } from '../context/UserContext';
@@ -27,6 +27,8 @@ const FEATURES = [
 
 export default function Paywall({ navigation }) {
   const { user, refreshUser, upgradeToPro } = useUser();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [loadingSub, setLoadingSub] = useState(false);
   const [loadingOne, setLoadingOne] = useState(false);
 
@@ -66,23 +68,21 @@ export default function Paywall({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Close */}
       <TouchableOpacity
         style={styles.close}
         onPress={() => navigation.goBack()}
         hitSlop={{ top: 10, left: 10, right: 10, bottom: 10 }}
       >
-        <Ionicons name="close" size={22} color={Colors.textSecondary} />
+        <Ionicons name="close" size={22} color={colors.textSecondary} />
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Hero */}
         <LinearGradient
-          colors={['rgba(123,97,255,0.18)', 'transparent']}
+          colors={[colors.accentGlow, 'transparent']}
           style={styles.hero}
         >
           <LinearGradient
-            colors={[Colors.accent, Colors.accentLight]}
+            colors={[colors.accent, colors.accentLight]}
             style={styles.starWrap}
           >
             <MaterialCommunityIcons name="star-circle" size={32} color="#fff" />
@@ -94,26 +94,23 @@ export default function Paywall({ navigation }) {
           </Text>
         </LinearGradient>
 
-        {/* Features */}
         <View style={styles.features}>
           {FEATURES.map((f) => (
             <View key={f} style={styles.featureRow}>
               <View style={styles.featureIcon}>
-                <MaterialCommunityIcons name="check" size={14} color={Colors.accent} />
+                <MaterialCommunityIcons name="check" size={14} color={colors.accent} />
               </View>
               <Text style={styles.featureText}>{f}</Text>
             </View>
           ))}
         </View>
 
-        {/* Price block */}
         <View style={styles.priceBlock}>
           <Text style={styles.price}>$4.99</Text>
           <Text style={styles.pricePer}>/month</Text>
         </View>
         <Text style={styles.trialNote}>3-day free trial · Cancel anytime</Text>
 
-        {/* Primary CTA */}
         <TouchableOpacity
           onPress={handleSubscribe}
           disabled={loadingSub}
@@ -121,7 +118,7 @@ export default function Paywall({ navigation }) {
           style={styles.primaryOuter}
         >
           <LinearGradient
-            colors={[Colors.accent, Colors.accentLight]}
+            colors={[colors.accent, colors.accentLight]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.primaryBtn}
@@ -134,7 +131,6 @@ export default function Paywall({ navigation }) {
           </LinearGradient>
         </TouchableOpacity>
 
-        {/* Secondary CTA */}
         <TouchableOpacity
           onPress={handleOneTime}
           disabled={loadingOne}
@@ -142,7 +138,7 @@ export default function Paywall({ navigation }) {
           style={styles.secondaryBtn}
         >
           {loadingOne ? (
-            <ActivityIndicator color={Colors.textSecondary} />
+            <ActivityIndicator color={colors.textSecondary} />
           ) : (
             <>
               <Text style={styles.secondaryText}>One-time unlock</Text>
@@ -161,8 +157,8 @@ export default function Paywall({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
+const makeStyles = (C) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: C.background },
   close: {
     position: 'absolute',
     top: Platform.OS === 'android' ? 16 : 56,
@@ -186,78 +182,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 4,
   },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-    textAlign: 'center',
-    letterSpacing: -0.4,
-  },
-  heroSub: {
-    fontSize: 15,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-    maxWidth: 280,
-  },
-  features: {
-    gap: 12,
-    marginBottom: 28,
-  },
-  featureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
+  heroTitle: { fontSize: 24, fontWeight: '800', color: C.textPrimary, textAlign: 'center', letterSpacing: -0.4 },
+  heroSub: { fontSize: 15, color: C.textSecondary, textAlign: 'center', lineHeight: 22, maxWidth: 280 },
+  features: { gap: 12, marginBottom: 28 },
+  featureRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   featureIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: Colors.accentGlow,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 24, height: 24, borderRadius: 12,
+    backgroundColor: C.accentGlow,
+    alignItems: 'center', justifyContent: 'center',
   },
-  featureText: {
-    fontSize: 15,
-    color: Colors.textPrimary,
-    flex: 1,
-    lineHeight: 22,
-  },
-  priceBlock: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'center',
-    gap: 4,
-    marginBottom: 4,
-  },
-  price: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-  },
-  pricePer: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    fontWeight: '500',
-  },
-  trialNote: {
-    fontSize: 13,
-    color: Colors.textMuted,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
+  featureText: { fontSize: 15, color: C.textPrimary, flex: 1, lineHeight: 22 },
+  priceBlock: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center', gap: 4, marginBottom: 4 },
+  price: { fontSize: 36, fontWeight: '800', color: C.textPrimary },
+  pricePer: { fontSize: 16, color: C.textSecondary, fontWeight: '500' },
+  trialNote: { fontSize: 13, color: C.textMuted, textAlign: 'center', marginBottom: 24 },
   primaryOuter: { borderRadius: 14, overflow: 'hidden', marginBottom: 12 },
-  primaryBtn: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 17,
-  },
-  primaryText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: -0.2,
-  },
+  primaryBtn: { alignItems: 'center', justifyContent: 'center', paddingVertical: 17 },
+  primaryText: { fontSize: 17, fontWeight: '700', color: '#fff', letterSpacing: -0.2 },
   secondaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -265,22 +206,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: C.border,
     marginBottom: 20,
   },
-  secondaryText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.textPrimary,
-  },
-  secondaryPrice: {
-    fontSize: 15,
-    color: Colors.textSecondary,
-  },
-  fine: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
+  secondaryText: { fontSize: 15, fontWeight: '600', color: C.textPrimary },
+  secondaryPrice: { fontSize: 15, color: C.textSecondary },
+  fine: { fontSize: 12, color: C.textMuted, textAlign: 'center', lineHeight: 18 },
 });
