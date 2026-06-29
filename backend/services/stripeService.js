@@ -1,8 +1,15 @@
 const Stripe = require('stripe');
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-09-30.acacia',
-});
+let _stripe = null;
+function getStripe() {
+  if (!_stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) return null;
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2024-09-30.acacia' });
+  }
+  return _stripe;
+}
+// Keep `stripe` as a getter-backed proxy so existing callers still work
+const stripe = new Proxy({}, { get: (_, prop) => getStripe()?.[prop] });
 
 const PRICES = {
   monthly: process.env.STRIPE_MONTHLY_PRICE_ID,  // $4.99/mo with 3-day trial

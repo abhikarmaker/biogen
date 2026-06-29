@@ -6,7 +6,12 @@ const {
   constructWebhookEvent,
 } = require('../services/stripeService');
 
+function stripeNotConfigured(res) {
+  return res.status(503).json({ error: 'Payments not configured yet.' });
+}
+
 async function subscribe(req, res) {
+  if (!process.env.STRIPE_SECRET_KEY) return stripeNotConfigured(res);
   const user = req.user;
 
   try {
@@ -35,6 +40,7 @@ async function subscribe(req, res) {
 }
 
 async function oneTime(req, res) {
+  if (!process.env.STRIPE_SECRET_KEY) return stripeNotConfigured(res);
   const user = req.user;
 
   try {
@@ -49,6 +55,7 @@ async function oneTime(req, res) {
 }
 
 async function webhook(req, res) {
+  if (!process.env.STRIPE_SECRET_KEY) return stripeNotConfigured(res);
   const sig = req.headers['stripe-signature'];
 
   let event;
