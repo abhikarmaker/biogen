@@ -76,9 +76,6 @@ export default function Users() {
     setTotal((t) => t - 1);
   };
 
-  const proCount = rows.filter((r) => r.plan === 'pro').length;
-  const conversionPct = rows.length > 0 ? ((proCount / rows.length) * 100).toFixed(0) : 0;
-
   const columns = [
     { key: 'email', label: 'Email', render: (r) => <span className="text-white">{r.email}</span> },
     { key: 'plan', label: 'Plan', render: (r) => <PlanBadge plan={r.plan} /> },
@@ -121,9 +118,6 @@ export default function Users() {
           <h1 className="text-2xl font-bold text-white">Users</h1>
           <p className="text-sm text-gray-400">
             {total.toLocaleString()} total
-            {!loading && rows.length > 0 && (
-              <span className="ml-2 text-accent font-medium">{conversionPct}% Pro</span>
-            )}
           </p>
         </div>
         <button onClick={fetchUsers} className="text-sm text-gray-400 hover:text-white transition-colors">

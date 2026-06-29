@@ -5,7 +5,7 @@ import { getOverview } from '../lib/api';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import { format, parseISO, formatDistanceToNow } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 function StatusBadge({ status }) {
   const color = status === 'active'

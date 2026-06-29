@@ -110,12 +110,12 @@ export default function Overview() {
     { label: 'Avg bios / user',    value: data?.avgBiosPerUser ?? '—',                      icon: '📊' },
   ];
 
-  // Merge and sort recent activity
+  // Merge and sort recent activity, guard against missing timestamps
   const activity = [
     ...(data?.recentUsers || []).map((u) => ({
       type: 'signup',
       icon: '👤',
-      title: u.email,
+      title: u.email || '—',
       sub: `Signed up · ${u.plan === 'pro' ? '⭐ Pro' : 'Free'}`,
       ts: u.created_at,
     })),
@@ -127,6 +127,7 @@ export default function Overview() {
       ts: b.created_at,
     })),
   ]
+    .filter((a) => !!a.ts)
     .sort((a, b) => new Date(b.ts) - new Date(a.ts))
     .slice(0, 8);
 

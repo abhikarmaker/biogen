@@ -63,16 +63,7 @@ router.get('/overview', adminMiddleware, async (req, res) => {
     const weekISO = weekAgo.toISOString();
     const monthISO = monthAgo.toISOString();
 
-    const [
-      totalUsersRes, freeUsersRes, proUsersRes,
-      totalBiosRes, activeSubsRes,
-      biosTodayRes, biosWeekRes,
-      newUsersTodayRes, newUsersWeekRes,
-      recentUsersRes, recentBiosRes,
-      platformBiosRes, toneBiosRes,
-      signupTrendRes, bioTrendRes,
-      subsRes,
-    ] = await Promise.all([
+    const settled = await Promise.allSettled([
       supabase.from('users').select('id', { count: 'exact', head: true }),
       supabase.from('users').select('id', { count: 'exact', head: true }).eq('plan', 'free'),
       supabase.from('users').select('id', { count: 'exact', head: true }).eq('plan', 'pro'),
@@ -90,6 +81,38 @@ router.get('/overview', adminMiddleware, async (req, res) => {
       supabase.from('bios').select('created_at').gte('created_at', monthISO),
       supabase.from('subscriptions').select('id, status, created_at, expires_at, users(email)').order('created_at', { ascending: false }).limit(20),
     ]);
+
+    // Safely extract each result — a failed query (e.g. table doesn't exist yet) returns a fallback
+    const val = (i, fallback) =>
+      settled[i].status === 'fulfilled' ? settled[i].value : fallback;
+
+    const [
+      totalUsersRes, freeUsersRes, proUsersRes,
+      totalBiosRes, activeSubsRes,
+      biosTodayRes, biosWeekRes,
+      newUsersTodayRes, newUsersWeekRes,
+      recentUsersRes, recentBiosRes,
+      platformBiosRes, toneBiosRes,
+      signupTrendRes, bioTrendRes,
+      subsRes,
+    ] = [
+      val(0,  { count: 0 }),
+      val(1,  { count: 0 }),
+      val(2,  { count: 0 }),
+      val(3,  { count: 0 }),
+      val(4,  { count: 0 }),
+      val(5,  { count: 0 }),
+      val(6,  { count: 0 }),
+      val(7,  { count: 0 }),
+      val(8,  { count: 0 }),
+      val(9,  { data: [] }),
+      val(10, { data: [] }),
+      val(11, { data: [] }),
+      val(12, { data: [] }),
+      val(13, { data: [] }),
+      val(14, { data: [] }),
+      val(15, { data: [] }),
+    ];
 
     const totalUsers = totalUsersRes.count || 0;
     const proUsers = proUsersRes.count || 0;
