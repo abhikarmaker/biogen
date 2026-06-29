@@ -30,17 +30,23 @@ export default function MyBios({ navigation }) {
   const fetchBios = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const data = await getBioHistory();
-      const supabaseIds = new Set((data.bios || []).map((b) => b.id));
-      const localOnly = savedBiosRef.current.filter((b) => !supabaseIds.has(b.id));
-      setBios([...localOnly, ...(data.bios || [])]);
+      if (isPro) {
+        // Pro: merge server history with any in-session bios not yet synced
+        const data = await getBioHistory();
+        const supabaseIds = new Set((data.bios || []).map((b) => b.id));
+        const localOnly = savedBiosRef.current.filter((b) => !supabaseIds.has(b.id));
+        setBios([...localOnly, ...(data.bios || [])]);
+      } else {
+        // Free: show only bios from the current session (cleared on sign-out)
+        setBios(savedBiosRef.current);
+      }
     } catch {
       setBios(savedBiosRef.current);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [isPro]);
 
   useEffect(() => { fetchBios(); }, [fetchBios]);
 
@@ -78,7 +84,7 @@ export default function MyBios({ navigation }) {
             style={styles.upgradeBannerInner}
           >
             <MaterialCommunityIcons name="star-circle" size={16} color="#fff" />
-            <Text style={styles.upgradeBannerText}>Upgrade to Pro to save unlimited bios</Text>
+            <Text style={styles.upgradeBannerText}>Upgrade to Pro to save your bios forever</Text>
             <MaterialCommunityIcons name="chevron-right" size={16} color="#fff" />
           </LinearGradient>
         </TouchableOpacity>
@@ -88,7 +94,11 @@ export default function MyBios({ navigation }) {
         <View style={styles.centered}>
           <MaterialCommunityIcons name="bookmark-outline" size={48} color={colors.textMuted} />
           <Text style={styles.emptyTitle}>No bios yet</Text>
-          <Text style={styles.emptySub}>Generate your first bio and it'll appear here</Text>
+          <Text style={styles.emptySub}>
+            {isPro
+              ? 'Generate your first bio and it\'ll be saved here forever'
+              : 'Bios you generate this session will appear here. Upgrade to Pro to keep them forever.'}
+          </Text>
           <TouchableOpacity
             style={styles.generateBtn}
             onPress={() => navigation.navigate('Generate')}
@@ -113,13 +123,13 @@ export default function MyBios({ navigation }) {
           )}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          refreshControl={
+          refreshControl={isPro ? (
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => { setRefreshing(true); fetchBios(true); }}
               tintColor={colors.accent}
             />
-          }
+          ) : undefined}
         />
       )}
     </SafeAreaView>

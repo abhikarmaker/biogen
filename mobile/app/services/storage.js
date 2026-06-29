@@ -41,5 +41,5 @@ export const removeUser = async () => {
 };
 
 export const clearAll = async () => {
-  await Promise.all([removeToken(), removeUser()]);
+  await Promise.all([removeToken(), removeUser(), removeAvatarUri(), removeDisplayName()]);
 };
