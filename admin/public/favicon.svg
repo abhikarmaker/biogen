@@ -1,0 +1,30 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0f0f"/>
+      <stop offset="100%" stop-color="#1c1410"/>
+    </linearGradient>
+    <linearGradient id="bline" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="40%" stop-color="#fca5a5"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="dotglow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fde68a" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#fde68a" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="rounded">
+      <rect width="1024" height="1024" rx="230"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#rounded)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <circle cx="700" cy="300" r="320" fill="#881337" opacity="0.1"/>
+    <path d="M310 200 L310 824" stroke="url(#bline)" stroke-width="72" stroke-linecap="round" fill="none"/>
+    <path d="M310 200 Q610 200 610 368 Q610 512 310 512" stroke="url(#bline)" stroke-width="72" stroke-linecap="round" fill="none"/>
+    <path d="M310 512 Q640 512 640 664 Q640 824 310 824" stroke="url(#bline)" stroke-width="72" stroke-linecap="round" fill="none"/>
+    <circle cx="756" cy="756" r="110" fill="url(#dotglow)"/>
+    <circle cx="756" cy="756" r="72" fill="#fde68a" opacity="0.92"/>
+    <path d="M718 756 L745 784 L796 722" stroke="#0f0f0f" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>
