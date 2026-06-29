@@ -167,9 +167,13 @@ async function findOrCreateOAuthUser(email, provider, oauthId) {
 
   if (existing) return existing;
 
+  // password_hash is NOT NULL in the schema; OAuth users never log in with a
+  // password, so give them a random hash they can't possibly know or use.
+  const randomHash = await bcrypt.hash(`${provider}:${oauthId}:${Date.now()}`, 12);
+
   const { data: newUser, error } = await supabase
     .from('users')
-    .insert({ email, plan: 'free', bio_count: 0 })
+    .insert({ email, password_hash: randomHash, plan: 'free', bio_count: 0 })
     .select()
     .single();
 
