@@ -65,6 +65,32 @@ export const login = async (email, password) => {
   }
 };
 
+export const loginWithGoogle = async (accessToken) => {
+  try {
+    const res = await authApi.post('/api/auth/google', { accessToken });
+    const { token, user } = res.data;
+    await saveToken(token);
+    await saveUser(user);
+    return user;
+  } catch (err) {
+    if (err.response) throw err;
+    throw new Error('Google sign-in requires an internet connection.');
+  }
+};
+
+export const loginWithApple = async (identityToken, email, fullName) => {
+  try {
+    const res = await authApi.post('/api/auth/apple', { identityToken, email, fullName });
+    const { token, user } = res.data;
+    await saveToken(token);
+    await saveUser(user);
+    return user;
+  } catch (err) {
+    if (err.response) throw err;
+    throw new Error('Apple sign-in requires an internet connection.');
+  }
+};
+
 export const logout = async () => {
   await clearAll();
 };
