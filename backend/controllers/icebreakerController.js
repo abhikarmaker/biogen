@@ -1,8 +1,9 @@
 const supabase = require('../services/supabaseService');
-const { generateIcebreakers: callGemini } = require('../services/geminiService');
+const { generateIcebreakers: callGemini, extractBioFromImages } = require('../services/geminiService');
 
 const TONES = ['Playful', 'Witty', 'Direct', 'Charming', 'Curious'];
 const MAX_BIO_LENGTH = 1000;
+const MAX_IMAGES = 5;
 
 // Template fallback — used when Gemini is unavailable
 function buildTemplateIcebreakers({ matchBio, tone, reference }) {
@@ -127,6 +128,37 @@ async function getHistory(req, res) {
   return res.json({ icebreakers });
 }
 
+async function extractBio(req, res) {
+  const { images } = req.body;
+
+  if (!Array.isArray(images) || images.length === 0) {
+    return res.status(400).json({ error: 'At least one screenshot is required' });
+  }
+  if (images.length > MAX_IMAGES) {
+    return res.status(400).json({ error: `Upload up to ${MAX_IMAGES} screenshots at a time` });
+  }
+  if (images.some((img) => !img?.base64 || !img?.mimeType)) {
+    return res.status(400).json({ error: 'Each image needs base64 data and a mime type' });
+  }
+
+  try {
+    const bio = await extractBioFromImages(images);
+    if (!bio) {
+      return res.status(502).json({ error: "Couldn't find any bio text in those screenshots. Try clearer images or paste it manually." });
+    }
+    return res.json({ bio: bio.slice(0, MAX_BIO_LENGTH) });
+  } catch (err) {
+    console.error('[extract-bio]', err.message);
+    await supabase.from('error_logs').insert({
+      user_id: req.user.id,
+      type: 'gemini_error',
+      message: err.message,
+      endpoint: '/api/icebreaker/extract-bio',
+    }).catch(() => {});
+    return res.status(502).json({ error: "Couldn't read those screenshots. Try again or paste the bio manually." });
+  }
+}
+
 async function deleteIcebreaker(req, res) {
   const { id } = req.params;
   const { error } = await supabase
@@ -139,4 +171,4 @@ async function deleteIcebreaker(req, res) {
   return res.json({ success: true });
 }
 
-module.exports = { generate, getHistory, deleteIcebreaker };
+module.exports = { generate, getHistory, deleteIcebreaker, extractBio };

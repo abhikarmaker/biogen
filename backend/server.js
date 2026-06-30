@@ -18,6 +18,9 @@ app.set('trust proxy', 1);
 // Stripe webhooks need raw body — must be before express.json()
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
+// Screenshot uploads need a larger body limit than the rest of the API
+app.use('/api/icebreaker/extract-bio', express.json({ limit: '15mb' }));
+
 app.use(express.json());
 app.use(
   cors({
@@ -53,6 +56,14 @@ app.use(
     windowMs: 60 * 60 * 1000,
     max: 30,
     message: { error: 'Generation limit reached. Try again in an hour.' },
+  })
+);
+app.use(
+  '/api/icebreaker/extract-bio',
+  rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 20,
+    message: { error: 'Screenshot upload limit reached. Try again in an hour.' },
   })
 );
 

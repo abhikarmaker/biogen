@@ -83,4 +83,19 @@ async function generateIcebreakers({ matchBio, tone, reference }) {
   return openers;
 }
 
-module.exports = { generateBio, generateIcebreakers };
+async function extractBioFromImages(images) {
+  const prompt = `These are screenshot(s) of someone's dating app profile. Extract and return only the bio text they wrote about themselves — their prompts/answers, captions, and written details. Ignore UI elements like buttons, percentages, distances, icons, and navigation chrome. If there are multiple screenshots, combine the text in natural reading order. Return only the extracted text, no commentary, no markdown, no surrounding quotes.`;
+
+  const model = genAI.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  });
+
+  const imageParts = images.map((img) => ({
+    inlineData: { data: img.base64, mimeType: img.mimeType },
+  }));
+
+  const result = await model.generateContent([prompt, ...imageParts]);
+  return result.response.text().trim();
+}
+
+module.exports = { generateBio, generateIcebreakers, extractBioFromImages };

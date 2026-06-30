@@ -34,6 +34,8 @@ export const deleteBio = (id) => api.delete(`/api/bio/${id}`);
 
 // Icebreaker
 export const generateIcebreakers = (payload) => api.post('/api/icebreaker/generate', payload);
+export const extractBioFromImages = (images) =>
+  api.post('/api/icebreaker/extract-bio', { images }, { timeout: 45000 });
 export const getIcebreakerHistory = () => api.get('/api/icebreaker/history');
 export const deleteIcebreaker = (id) => api.delete(`/api/icebreaker/${id}`);
 

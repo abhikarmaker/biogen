@@ -11,16 +11,21 @@ import {
   Platform,
   KeyboardAvoidingView,
   Image,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../context/UserContext';
 import TonePill from '../components/TonePill';
 import { getIcebreakerStreak } from '../services/storage';
+import { extractBioFromImages } from '../services/api';
 
 const TONES = ['Playful', 'Witty', 'Direct', 'Charming', 'Curious'];
 const MAX_BIO_LENGTH = 1000;
+const MAX_SCREENSHOTS = 5;
 
 export default function Icebreaker({ navigation }) {
   const { user } = useUser();
@@ -31,6 +36,8 @@ export default function Icebreaker({ navigation }) {
   const [tone, setTone] = useState('Playful');
   const [reference, setReference] = useState('');
   const [streak, setStreak] = useState(0);
+  const [screenshots, setScreenshots] = useState([]);
+  const [extracting, setExtracting] = useState(false);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -38,6 +45,64 @@ export default function Icebreaker({ navigation }) {
   }, [user?.id]);
 
   const canGenerate = matchBio.trim().length > 0;
+
+  const pickScreenshots = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'Allow access to your photos to upload a screenshot.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      selectionLimit: MAX_SCREENSHOTS,
+      quality: 0.6,
+      base64: true,
+    });
+    if (result.canceled || !result.assets?.length) return;
+
+    const picked = result.assets
+      .filter((a) => a.base64)
+      .slice(0, MAX_SCREENSHOTS)
+      .map((a) => ({ uri: a.uri, base64: a.base64, mimeType: a.mimeType || 'image/jpeg' }));
+
+    if (!picked.length) return;
+    setScreenshots(picked);
+    runExtraction(picked);
+  };
+
+  const removeScreenshot = (uri) => {
+    setScreenshots((prev) => prev.filter((s) => s.uri !== uri));
+  };
+
+  const runExtraction = async (picked) => {
+    setExtracting(true);
+    try {
+      const { bio } = await extractBioFromImages(
+        picked.map(({ base64, mimeType }) => ({ base64, mimeType }))
+      );
+      if (!bio) {
+        Alert.alert("Couldn't read that", 'No bio text was found in those screenshots. Try clearer images or paste it manually.');
+        return;
+      }
+      if (matchBio.trim()) {
+        Alert.alert(
+          'Replace bio text?',
+          "You've already got text in the bio field. Replace it with the text from these screenshots?",
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Replace', onPress: () => setMatchBio(bio) },
+          ]
+        );
+      } else {
+        setMatchBio(bio);
+      }
+    } catch (err) {
+      Alert.alert('Error', err.message || "Couldn't read those screenshots. Try again or paste the bio manually.");
+    } finally {
+      setExtracting(false);
+    }
+  };
 
   const handleGenerate = () => {
     if (!canGenerate) return;
@@ -91,6 +156,39 @@ export default function Icebreaker({ navigation }) {
               textAlignVertical="top"
             />
             <Text style={styles.charCount}>{matchBio.length}/{MAX_BIO_LENGTH}</Text>
+
+            <TouchableOpacity
+              onPress={pickScreenshots}
+              disabled={extracting}
+              style={styles.uploadLink}
+              activeOpacity={0.7}
+            >
+              {extracting ? (
+                <ActivityIndicator size="small" color={colors.accent} />
+              ) : (
+                <MaterialCommunityIcons name="image-multiple-outline" size={16} color={colors.accent} />
+              )}
+              <Text style={styles.uploadLinkText}>
+                {extracting ? 'Reading screenshots...' : "Can't copy the bio? Upload screenshot(s) instead"}
+              </Text>
+            </TouchableOpacity>
+
+            {screenshots.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.thumbRow}>
+                {screenshots.map((s) => (
+                  <View key={s.uri} style={styles.thumbWrap}>
+                    <Image source={{ uri: s.uri }} style={styles.thumb} />
+                    <TouchableOpacity
+                      onPress={() => removeScreenshot(s.uri)}
+                      style={styles.thumbRemove}
+                      hitSlop={{ top: 8, left: 8, right: 8, bottom: 8 }}
+                    >
+                      <Ionicons name="close" size={12} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
           </View>
 
           <View style={styles.field}>
@@ -186,6 +284,22 @@ const makeStyles = (C) => StyleSheet.create({
     minHeight: 120,
   },
   charCount: { fontSize: 11, color: C.textMuted, textAlign: 'right', marginTop: 4 },
+  uploadLink: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
+  uploadLinkText: { fontSize: 13, fontWeight: '600', color: C.accent },
+  thumbRow: { marginTop: 10 },
+  thumbWrap: { marginRight: 8, position: 'relative' },
+  thumb: { width: 56, height: 56, borderRadius: 10, backgroundColor: C.surface },
+  thumbRemove: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   input: {
     backgroundColor: C.surface,
     borderRadius: 12,
