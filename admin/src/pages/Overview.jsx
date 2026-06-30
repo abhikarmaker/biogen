@@ -55,13 +55,14 @@ function TrendChart({ data, color = '#7B61FF', label }) {
 }
 
 function PlatformBar({ data }) {
-  const formatted = (data || []).slice(0, 8).map((d) => ({
+  const formatted = (data || []).map((d) => ({
     name: PLATFORM_LABELS[d.platform] || d.platform,
     count: d.count,
   }));
+  const height = Math.max(160, formatted.length * 40);
 
   return (
-    <ResponsiveContainer width="100%" height={160}>
+    <ResponsiveContainer width="100%" height={height}>
       <BarChart data={formatted} layout="vertical" margin={{ top: 0, right: 8, bottom: 0, left: 4 }}>
         <XAxis type="number" tick={{ fill: '#55556B', fontSize: 10 }} tickLine={false} axisLine={false} allowDecimals={false} />
         <YAxis dataKey="name" type="category" tick={{ fill: '#8B8BAA', fontSize: 11 }} tickLine={false} axisLine={false} width={68} />

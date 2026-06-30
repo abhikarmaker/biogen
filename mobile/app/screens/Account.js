@@ -69,10 +69,16 @@ export default function Account({ navigation }) {
   const [nameModalVisible, setNameModalVisible] = useState(false);
   const [nameInput, setNameInput] = useState('');
 
+  const userId = user?.id;
+
   useEffect(() => {
-    getAvatarUri().then((uri) => uri && setAvatarUri(uri));
-    getDisplayName().then((name) => name && setDisplayName(name));
-  }, []);
+    // Clear immediately so previous user's data never bleeds into the next session
+    setAvatarUri(null);
+    setDisplayName('');
+    if (!userId) return;
+    getAvatarUri(userId).then((uri) => setAvatarUri(uri || null));
+    getDisplayName(userId).then((name) => setDisplayName(name || ''));
+  }, [userId]);
 
   const handlePickAvatar = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -89,7 +95,7 @@ export default function Account({ navigation }) {
     if (!result.canceled && result.assets[0]?.uri) {
       const uri = result.assets[0].uri;
       setAvatarUri(uri);
-      await saveAvatarUri(uri);
+      if (userId) await saveAvatarUri(userId, uri);
     }
   };
 
@@ -101,7 +107,7 @@ export default function Account({ navigation }) {
   const saveNameModal = async () => {
     const trimmed = nameInput.trim();
     setDisplayName(trimmed);
-    await saveDisplayName(trimmed);
+    if (userId) await saveDisplayName(userId, trimmed);
     setNameModalVisible(false);
   };
 

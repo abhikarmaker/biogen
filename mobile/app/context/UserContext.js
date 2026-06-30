@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getUser, getToken } from '../services/storage';
+import { getUser, getToken, removeAvatarUri, removeDisplayName } from '../services/storage';
 import { getUserProfile } from '../services/api';
 import { logout as authLogout } from '../services/auth';
 
@@ -45,7 +45,11 @@ export function UserProvider({ children }) {
   };
 
   const logout = async () => {
+    const uid = user?.id;
     await authLogout();
+    if (uid) {
+      await Promise.all([removeAvatarUri(uid), removeDisplayName(uid)]);
+    }
     setUser(null);
     setIsAuthenticated(false);
     setSavedBios([]);

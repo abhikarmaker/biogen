@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getSettings, updateSettings } from '../lib/api';
+import { getSettings, updateSettings, getHealth } from '../lib/api';
 
 const GEMINI_MODELS = [
   'gemini-1.5-flash',
@@ -18,12 +18,16 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [health, setHealth] = useState(null);
 
   useEffect(() => {
-    getSettings()
-      .then(setSettings)
-      .catch(() => setSettings(DEFAULTS))
-      .finally(() => setLoading(false));
+    Promise.all([
+      getSettings().catch(() => DEFAULTS),
+      getHealth().catch(() => null),
+    ]).then(([s, h]) => {
+      setSettings(s || DEFAULTS);
+      setHealth(h);
+    }).finally(() => setLoading(false));
   }, []);
 
   const handleSave = async () => {
@@ -117,16 +121,20 @@ export default function Settings() {
         <div className="bg-surface border border-border rounded-xl p-5 space-y-3">
           <h2 className="text-sm font-semibold text-white">Connection status</h2>
           {[
-            { label: 'Supabase', status: 'Not connected' },
-            { label: 'Stripe webhook', status: 'Not connected' },
-            { label: 'Gemini API', status: 'Not connected' },
-          ].map(({ label, status }) => (
+            { label: 'Supabase', ok: health?.supabase },
+            { label: 'Gemini API', ok: health?.gemini },
+            { label: 'Stripe', ok: health?.stripe },
+          ].map(({ label, ok }) => (
             <div key={label} className="flex items-center justify-between text-sm">
               <span className="text-gray-400">{label}</span>
-              <span className="flex items-center gap-1.5 text-gray-500">
-                <span className="w-2 h-2 bg-gray-600 rounded-full" />
-                {status}
-              </span>
+              {health === null ? (
+                <span className="text-xs text-gray-600">Checking...</span>
+              ) : (
+                <span className={`flex items-center gap-1.5 ${ok ? 'text-green-400' : 'text-gray-500'}`}>
+                  <span className={`w-2 h-2 rounded-full ${ok ? 'bg-green-400' : 'bg-gray-600'}`} />
+                  {ok ? 'Connected' : 'Not configured'}
+                </span>
+              )}
             </div>
           ))}
         </div>

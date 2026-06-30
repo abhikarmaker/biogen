@@ -29,6 +29,7 @@ export const deleteUser = (id) => api.delete(`/api/admin/users/${id}`);
 export const getBios = (params) => api.get('/api/admin/bios', { params });
 export const deleteBioAdmin = (id) => api.delete(`/api/admin/bios/${id}`);
 export const getErrors = () => api.get('/api/admin/errors');
+export const getHealth = () => api.get('/api/admin/health');
 export const getSettings = () => api.get('/api/admin/settings');
 export const updateSettings = (data) => api.put('/api/admin/settings', data);
 

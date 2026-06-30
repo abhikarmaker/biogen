@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,7 @@ const FEATURES = [
 ];
 
 export default function Paywall({ navigation }) {
-  const { user, refreshUser, upgradeToPro } = useUser();
+  const { user, refreshUser, upgradeToPro, isPro } = useUser();
   const { colors } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [loadingSub, setLoadingSub] = useState(false);
@@ -34,13 +34,21 @@ export default function Paywall({ navigation }) {
 
   // Paywall can be opened from other tabs (Account, My Bios) where the
   // GenerateStack may have no prior screen. canGoBack() guards against that.
-  const dismiss = () => {
+  const dismiss = useCallback(() => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
       navigation.navigate('PlatformPicker');
     }
-  };
+  }, [navigation]);
+
+  // Refresh plan on mount — catches stale cached plan (e.g. purchase completed elsewhere)
+  useEffect(() => { refreshUser(); }, []);
+
+  // Auto-dismiss if already Pro (stale cache resolved or just purchased)
+  useEffect(() => {
+    if (isPro) dismiss();
+  }, [isPro, dismiss]);
 
   const handleSubscribe = async () => {
     setLoadingSub(true);

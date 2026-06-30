@@ -1,16 +1,16 @@
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AVATAR_KEY = 'biogen_avatar_uri';
-const DISPLAY_NAME_KEY = 'biogen_display_name';
+const avatarKey = (uid) => `biogen_avatar_${uid}`;
+const nameKey = (uid) => `biogen_name_${uid}`;
 
-export const saveAvatarUri = (uri) => AsyncStorage.setItem(AVATAR_KEY, uri);
-export const getAvatarUri = () => AsyncStorage.getItem(AVATAR_KEY);
-export const removeAvatarUri = () => AsyncStorage.removeItem(AVATAR_KEY);
+export const saveAvatarUri = (uid, uri) => AsyncStorage.setItem(avatarKey(uid), uri);
+export const getAvatarUri = (uid) => AsyncStorage.getItem(avatarKey(uid));
+export const removeAvatarUri = (uid) => AsyncStorage.removeItem(avatarKey(uid));
 
-export const saveDisplayName = (name) => AsyncStorage.setItem(DISPLAY_NAME_KEY, name);
-export const getDisplayName = () => AsyncStorage.getItem(DISPLAY_NAME_KEY);
-export const removeDisplayName = () => AsyncStorage.removeItem(DISPLAY_NAME_KEY);
+export const saveDisplayName = (uid, name) => AsyncStorage.setItem(nameKey(uid), name);
+export const getDisplayName = (uid) => AsyncStorage.getItem(nameKey(uid));
+export const removeDisplayName = (uid) => AsyncStorage.removeItem(nameKey(uid));
 
 const TOKEN_KEY = 'biogen_token';
 const USER_KEY = 'biogen_user';
@@ -41,5 +41,5 @@ export const removeUser = async () => {
 };
 
 export const clearAll = async () => {
-  await Promise.all([removeToken(), removeUser(), removeAvatarUri(), removeDisplayName()]);
+  await Promise.all([removeToken(), removeUser()]);
 };

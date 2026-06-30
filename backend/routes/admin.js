@@ -133,7 +133,7 @@ router.get('/overview', adminMiddleware, async (req, res) => {
       avgBiosPerUser: totalUsers > 0 ? (totalBios / totalUsers).toFixed(1) : '0',
       conversionRate: totalUsers > 0 ? ((proUsers / totalUsers) * 100).toFixed(1) : '0',
       // Breakdowns (last 30 days)
-      platformBreakdown: groupByField(platformBiosRes.data || [], 'platform').slice(0, 10),
+      platformBreakdown: groupByField(platformBiosRes.data || [], 'platform'),
       toneBreakdown: groupByField(toneBiosRes.data || [], 'tone'),
       // Daily trends (last 30 days)
       signupsTrend: groupByDay(signupTrendRes.data || []),
@@ -225,6 +225,21 @@ router.put('/settings', adminMiddleware, async (req, res) => {
   return res.json({ success: true });
 });
 
+// ── Health check ───────────────────────────────────────
+router.get('/health', adminMiddleware, async (req, res) => {
+  let supabaseOk = false;
+  try {
+    const { error } = await supabase.from('users').select('id', { count: 'exact', head: true });
+    supabaseOk = !error;
+  } catch { /* not connected */ }
+
+  return res.json({
+    supabase: supabaseOk,
+    gemini: !!process.env.GEMINI_API_KEY,
+    stripe: !!process.env.STRIPE_SECRET_KEY,
+  });
+});
+
 // ── Error logs ─────────────────────────────────────────
 router.get('/errors', adminMiddleware, async (req, res) => {
   const { data, error } = await supabase
@@ -232,8 +247,11 @@ router.get('/errors', adminMiddleware, async (req, res) => {
     .select('*')
     .order('created_at', { ascending: false })
     .limit(100);
-  // error_logs table may not exist yet — return empty array rather than 500
-  if (error) return res.json({ errors: [] });
+  if (error) {
+    // 42P01 = relation (table) does not exist in PostgreSQL
+    if (error.code === '42P01') return res.json({ setup_required: true, errors: [] });
+    return res.json({ errors: [] });
+  }
   return res.json({ errors: data || [] });
 });
 
