@@ -13,8 +13,9 @@ function buildTemplateBio({ platform, role, interests, tone, length }) {
   const limit = CHAR_LIMITS[platform] || 300;
 
   const interestList = interests.split(/[,.\n]+/).map((s) => s.trim()).filter(Boolean);
-  const first = interestList[0] || interests;
-  const others = interestList.slice(1, 3).join(' and ');
+  const shuffled = [...interestList].sort(() => Math.random() - 0.5);
+  const first = shuffled[0] || interests;
+  const others = shuffled.slice(1, 3).join(' and ');
 
   const templates = {
     linkedin: {

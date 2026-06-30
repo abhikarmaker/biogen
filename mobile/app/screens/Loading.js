@@ -25,9 +25,10 @@ function buildMockBio({ platform, role, interests, tone, length }) {
     .split(/[,.\n]+/)
     .map((s) => s.trim())
     .filter(Boolean);
+  const shuffled = [...interestList].sort(() => Math.random() - 0.5);
 
-  const first = interestList[0] || interests;
-  const others = interestList.slice(1, 3).join(' and ');
+  const first = shuffled[0] || interests;
+  const others = shuffled.slice(1, 3).join(' and ');
 
   const templates = {
     linkedin: {

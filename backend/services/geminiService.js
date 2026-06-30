@@ -64,13 +64,24 @@ const DATING_VIBE = {
   happn: 'Happn bios should feel grounded in everyday life and place — casual and approachable, like running into someone interesting nearby.',
 };
 
+// Picked randomly per request so regenerating with identical inputs doesn't
+// converge on the same structure every time.
+const ANGLE_HINTS = [
+  'Open with a question.',
+  'Open with a quick, specific scene or moment.',
+  'Open with a playful or bold claim about yourself.',
+  'Lead with your interests, then circle back to who you are.',
+  'Open with a one-line observation about yourself.',
+];
+
 async function generateBio({ platform, role, interests, tone, length }) {
   const charLimit = CHAR_LIMITS[platform] || 300;
   const lengthGuide = LENGTH_GUIDANCE[length] || LENGTH_GUIDANCE.Medium;
   const platformName = PLATFORM_NAMES[platform] || platform;
   const vibe = DATING_VIBE[platform];
+  const angle = ANGLE_HINTS[Math.floor(Math.random() * ANGLE_HINTS.length)];
 
-  const prompt = `Write a ${length.toLowerCase()}, ${tone.toLowerCase()} bio for ${platformName} for someone who ${role}. They love ${interests}. ${lengthGuide}${vibe ? ` ${vibe}` : ''} The bio should feel natural, human, and authentic. No hashtags. No filler phrases like "passionate about" or "I am a". Max ${charLimit} characters. Return only the bio text, nothing else.`;
+  const prompt = `Write a ${length.toLowerCase()}, ${tone.toLowerCase()} bio for ${platformName} for someone who ${role}. They love ${interests}. ${lengthGuide}${vibe ? ` ${vibe}` : ''} ${angle} The bio should feel natural, human, and authentic. No hashtags. No filler phrases like "passionate about" or "I am a". Max ${charLimit} characters. Return only the bio text, nothing else.`;
 
   const model = genAI.getGenerativeModel({
     model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
