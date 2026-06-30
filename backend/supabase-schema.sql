@@ -39,6 +39,17 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Icebreakers table (dating tab: opener generations)
+CREATE TABLE IF NOT EXISTS icebreakers (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  match_bio   TEXT NOT NULL,
+  tone        TEXT,
+  reference   TEXT,
+  openers     JSONB NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Error logs
 CREATE TABLE IF NOT EXISTS error_logs (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -72,5 +83,7 @@ $$ LANGUAGE sql;
 -- Indexes
 CREATE INDEX IF NOT EXISTS bios_user_id_idx ON bios(user_id);
 CREATE INDEX IF NOT EXISTS bios_created_at_idx ON bios(created_at DESC);
+CREATE INDEX IF NOT EXISTS icebreakers_user_id_idx ON icebreakers(user_id);
+CREATE INDEX IF NOT EXISTS icebreakers_created_at_idx ON icebreakers(created_at DESC);
 CREATE INDEX IF NOT EXISTS subs_user_id_idx ON subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS error_logs_created_idx ON error_logs(created_at DESC);

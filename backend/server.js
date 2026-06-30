@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth');
 const bioRoutes = require('./routes/bio');
+const icebreakerRoutes = require('./routes/icebreaker');
 const paymentsRoutes = require('./routes/payments');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
@@ -37,7 +38,7 @@ app.use(
   })
 );
 
-// Tight limit on AI generation endpoint
+// Tight limit on AI generation endpoints
 app.use(
   '/api/bio/generate',
   rateLimit({
@@ -46,10 +47,19 @@ app.use(
     message: { error: 'Generation limit reached. Try again in an hour.' },
   })
 );
+app.use(
+  '/api/icebreaker/generate',
+  rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 30,
+    message: { error: 'Generation limit reached. Try again in an hour.' },
+  })
+);
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/bio', bioRoutes);
+app.use('/api/icebreaker', icebreakerRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);

@@ -12,6 +12,15 @@ export const saveDisplayName = (uid, name) => AsyncStorage.setItem(nameKey(uid),
 export const getDisplayName = (uid) => AsyncStorage.getItem(nameKey(uid));
 export const removeDisplayName = (uid) => AsyncStorage.removeItem(nameKey(uid));
 
+const streakKey = (uid) => `biogen_icebreaker_streak_${uid}`;
+
+export const getIcebreakerStreak = async (uid) => {
+  const raw = await AsyncStorage.getItem(streakKey(uid));
+  return raw ? JSON.parse(raw) : { count: 0, lastDate: null };
+};
+export const saveIcebreakerStreak = (uid, streak) =>
+  AsyncStorage.setItem(streakKey(uid), JSON.stringify(streak));
+
 const TOKEN_KEY = 'biogen_token';
 const USER_KEY = 'biogen_user';
 

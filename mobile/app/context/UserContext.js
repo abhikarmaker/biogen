@@ -10,6 +10,7 @@ export function UserProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [savedBios, setSavedBios] = useState([]);
+  const [savedIcebreakers, setSavedIcebreakers] = useState([]);
 
   const loadUser = useCallback(async () => {
     try {
@@ -53,6 +54,7 @@ export function UserProvider({ children }) {
     setUser(null);
     setIsAuthenticated(false);
     setSavedBios([]);
+    setSavedIcebreakers([]);
   };
 
   const refreshUser = async () => {
@@ -81,6 +83,14 @@ export function UserProvider({ children }) {
     setSavedBios((prev) => prev.filter((b) => b.id !== id));
   };
 
+  const addIcebreaker = (icebreaker) => {
+    setSavedIcebreakers((prev) => [icebreaker, ...prev]);
+  };
+
+  const removeIcebreaker = (id) => {
+    setSavedIcebreakers((prev) => prev.filter((i) => i.id !== id));
+  };
+
   const isPro = user?.plan === 'pro';
   const biosUsed = user?.bio_count || 0;
   const freeLimit = user?.free_limit || 3;
@@ -104,6 +114,7 @@ export function UserProvider({ children }) {
         canGenerate,
         quotaResetsAt,
         savedBios,
+        savedIcebreakers,
         login,
         logout,
         refreshUser,
@@ -111,6 +122,8 @@ export function UserProvider({ children }) {
         upgradeToPro,
         addBio,
         removeBio,
+        addIcebreaker,
+        removeIcebreaker,
       }}
     >
       {children}

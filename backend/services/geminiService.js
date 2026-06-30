@@ -56,4 +56,31 @@ async function generateBio({ platform, role, interests, tone, length }) {
   return text;
 }
 
-module.exports = { generateBio };
+async function generateIcebreakers({ matchBio, tone, reference }) {
+  const referenceLine = reference
+    ? `Specifically reference this detail from their bio: "${reference}".`
+    : 'Pick the most interesting, specific detail from their bio to reference — avoid anything generic.';
+
+  const prompt = `Someone's dating app bio is: "${matchBio}". Write exactly 3 short, ${tone.toLowerCase()} opening messages to send them on a dating app. ${referenceLine} Each opener should be a single message, 1-2 sentences, no emojis unless ${tone.toLowerCase() === 'playful' ? 'it fits naturally' : 'never'}, no generic lines like "hey" or "how's your day going". Make each of the 3 openers distinct from each other in angle or phrasing. Return only the 3 openers, one per line, with no numbering, labels, or extra commentary.`;
+
+  const model = genAI.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  });
+
+  const result = await model.generateContent(prompt);
+  const text = result.response.text().trim();
+
+  const openers = text
+    .split('\n')
+    .map((line) => line.replace(/^[\d.\-)\s]+/, '').trim())
+    .filter(Boolean)
+    .slice(0, 3);
+
+  if (openers.length < 3) {
+    throw new Error('Gemini returned fewer than 3 openers');
+  }
+
+  return openers;
+}
+
+module.exports = { generateBio, generateIcebreakers };

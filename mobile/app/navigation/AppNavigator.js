@@ -15,6 +15,10 @@ import AboutYou from '../screens/AboutYou';
 import Loading from '../screens/Loading';
 import Result from '../screens/Result';
 import Paywall from '../screens/Paywall';
+import Icebreaker from '../screens/Icebreaker';
+import IcebreakerLoading from '../screens/IcebreakerLoading';
+import IcebreakerResult from '../screens/IcebreakerResult';
+import MyIcebreakers from '../screens/MyIcebreakers';
 import MyBios from '../screens/MyBios';
 import Account from '../screens/Account';
 import Auth from '../screens/Auth';
@@ -41,6 +45,25 @@ function GenerateStack() {
   );
 }
 
+function IcebreakerStack() {
+  const { colors } = useTheme();
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: colors.background },
+        animation: 'slide_from_right',
+      }}
+    >
+      <Stack.Screen name="Icebreaker" component={Icebreaker} />
+      <Stack.Screen name="IcebreakerLoading" component={IcebreakerLoading} options={{ gestureEnabled: false }} />
+      <Stack.Screen name="IcebreakerResult" component={IcebreakerResult} />
+      <Stack.Screen name="MyIcebreakers" component={MyIcebreakers} />
+      <Stack.Screen name="Paywall" component={Paywall} options={{ animation: 'slide_from_bottom' }} />
+    </Stack.Navigator>
+  );
+}
+
 function MainTabs() {
   const { colors } = useTheme();
   return (
@@ -61,6 +84,7 @@ function MainTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           const icons = {
             Generate: focused ? 'lightning-bolt' : 'lightning-bolt-outline',
+            Icebreakers: focused ? 'chat-processing' : 'chat-processing-outline',
             'My Bios': focused ? 'bookmark-multiple' : 'bookmark-multiple-outline',
             Account: focused ? 'account-circle' : 'account-circle-outline',
           };
@@ -69,6 +93,7 @@ function MainTabs() {
       })}
     >
       <Tab.Screen name="Generate" component={GenerateStack} />
+      <Tab.Screen name="Icebreakers" component={IcebreakerStack} />
       <Tab.Screen name="My Bios" component={MyBios} />
       <Tab.Screen name="Account" component={Account} />
     </Tab.Navigator>

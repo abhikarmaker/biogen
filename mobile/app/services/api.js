@@ -32,6 +32,11 @@ export const generateBio = (payload) => api.post('/api/bio/generate', payload);
 export const getBioHistory = () => api.get('/api/bio/history');
 export const deleteBio = (id) => api.delete(`/api/bio/${id}`);
 
+// Icebreaker
+export const generateIcebreakers = (payload) => api.post('/api/icebreaker/generate', payload);
+export const getIcebreakerHistory = () => api.get('/api/icebreaker/history');
+export const deleteIcebreaker = (id) => api.delete(`/api/icebreaker/${id}`);
+
 // User
 export const getUserProfile = () => api.get('/api/user/profile');
 export const restorePurchases = () => api.post('/api/user/restore');
