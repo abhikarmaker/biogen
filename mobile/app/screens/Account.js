@@ -23,6 +23,7 @@ import ProBadge from '../components/ProBadge';
 import { restorePurchases } from '../services/api';
 import { saveAvatarUri, getAvatarUri, saveDisplayName, getDisplayName } from '../services/storage';
 import { format } from 'date-fns';
+import { radii } from '../constants/radii';
 
 function SettingRow({ icon, label, value, onPress, destructive, noBorder, colors }) {
   return (
@@ -210,12 +211,12 @@ export default function Account({ navigation }) {
                   activeOpacity={0.85}
                 >
                   <LinearGradient
-                    colors={['#FFD700', '#FFA500']}
+                    colors={[colors.proGold, colors.proGoldDark]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.upgradeChipInner}
                   >
-                    <Text style={styles.upgradeChipText}>Upgrade</Text>
+                    <Text style={[styles.upgradeChipText, { color: colors.proText }]}>Upgrade</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               </View>
@@ -375,7 +376,7 @@ const makeStyles = (C) => StyleSheet.create({
     right: 0,
     width: 24,
     height: 24,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
@@ -388,17 +389,17 @@ const makeStyles = (C) => StyleSheet.create({
   // Plan card
   planCard: {
     marginHorizontal: 16,
-    borderRadius: 16,
+    borderRadius: radii.lg,
     overflow: 'hidden',
     marginBottom: 24,
   },
-  planGradient: { padding: 18, borderRadius: 16 },
+  planGradient: { padding: 18, borderRadius: radii.lg },
   planFree: {
     padding: 18,
     backgroundColor: C.surface,
     borderWidth: 1.5,
     borderColor: C.border,
-    borderRadius: 16,
+    borderRadius: radii.lg,
   },
   planRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   planStatus: { fontSize: 16, fontWeight: '700', color: '#fff', marginBottom: 2 },
@@ -407,7 +408,7 @@ const makeStyles = (C) => StyleSheet.create({
   planUsage: { fontSize: 13, color: C.textMuted, marginTop: 4 },
   upgradeChip: { borderRadius: 10, overflow: 'hidden' },
   upgradeChipInner: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10 },
-  upgradeChipText: { fontSize: 13, fontWeight: '700', color: '#1A1000' },
+  upgradeChipText: { fontSize: 13, fontWeight: '700' },
 
   // Section headers
   sectionHeader: { paddingHorizontal: 20, paddingBottom: 6 },
@@ -417,7 +418,7 @@ const makeStyles = (C) => StyleSheet.create({
   section: {
     marginHorizontal: 16,
     backgroundColor: C.surface,
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
     borderColor: C.border,
     marginBottom: 20,
@@ -461,7 +462,7 @@ const makeStyles = (C) => StyleSheet.create({
   modalCard: {
     width: '100%',
     backgroundColor: C.surface,
-    borderRadius: 20,
+    borderRadius: radii.xl,
     padding: 24,
     borderWidth: 1,
     borderColor: C.border,
@@ -469,7 +470,7 @@ const makeStyles = (C) => StyleSheet.create({
   modalTitle: { fontSize: 17, fontWeight: '700', color: C.textPrimary, marginBottom: 16 },
   modalInput: {
     backgroundColor: C.background,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
     paddingHorizontal: 14,
@@ -482,7 +483,7 @@ const makeStyles = (C) => StyleSheet.create({
   modalBtn: {
     flex: 1,
     paddingVertical: 13,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     alignItems: 'center',
   },
   modalBtnCancel: { backgroundColor: C.background, borderWidth: 1, borderColor: C.border },

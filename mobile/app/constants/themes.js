@@ -18,6 +18,9 @@ export const darkTheme = {
   platformDating: '#F87171',
   platformSocial: '#60A5FA',
   platformCreative: '#E879F9',
+  proGold: '#FFD700',
+  proGoldDark: '#FFA500',
+  proText: '#1A1000',
 };
 
 export const lightTheme = {
@@ -40,4 +43,7 @@ export const lightTheme = {
   platformDating: '#DC2626',
   platformSocial: '#2563EB',
   platformCreative: '#C026D3',
+  proGold: '#FFD700',
+  proGoldDark: '#FFA500',
+  proText: '#1A1000',
 };

@@ -14,6 +14,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useTheme } from '../context/ThemeContext';
 import ProBadge from '../components/ProBadge';
 import { useUser } from '../context/UserContext';
+import { radii } from '../constants/radii';
 
 function OpenerCard({ opener, index, colors, styles }) {
   const [copied, setCopied] = useState(false);
@@ -143,14 +144,14 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'center',
     gap: 7,
     paddingVertical: 10,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     backgroundColor: 'rgba(251, 191, 36, 0.1)',
     marginBottom: 18,
   },
   streakBannerText: { fontSize: 13, fontWeight: '600', color: C.warning },
   card: {
     backgroundColor: C.surface,
-    borderRadius: 16,
+    borderRadius: radii.lg,
     borderWidth: 1,
     borderColor: C.border,
     padding: 16,
@@ -163,7 +164,7 @@ const makeStyles = (C) => StyleSheet.create({
   cardText: { fontSize: 15, color: C.textPrimary, lineHeight: 23, marginBottom: 12 },
   copyBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' },
   copyText: { fontSize: 13, fontWeight: '600', color: C.accentLight },
-  generateOuter: { borderRadius: 14, overflow: 'hidden', marginBottom: 12, marginTop: 6 },
+  generateOuter: { borderRadius: radii.md, overflow: 'hidden', marginBottom: 12, marginTop: 6 },
   generateBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 17, gap: 8 },
   generateText: { fontSize: 16, fontWeight: '700', color: '#fff', letterSpacing: -0.2 },
   upgradeBtn: {
@@ -172,7 +173,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1.5,
     borderColor: C.warning,
     backgroundColor: 'rgba(251, 191, 36, 0.07)',

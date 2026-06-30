@@ -16,6 +16,7 @@ import { useTheme } from '../context/ThemeContext';
 import ProBadge from '../components/ProBadge';
 import { createSubscription, createOneTimePayment } from '../services/api';
 import { useUser } from '../context/UserContext';
+import { radii } from '../constants/radii';
 
 const FEATURES = [
   'Unlimited bios across all platforms',
@@ -188,7 +189,7 @@ const makeStyles = (C) => StyleSheet.create({
   hero: {
     alignItems: 'center',
     paddingVertical: 32,
-    borderRadius: 20,
+    borderRadius: radii.xl,
     marginBottom: 28,
     gap: 10,
   },
@@ -205,7 +206,7 @@ const makeStyles = (C) => StyleSheet.create({
   features: { gap: 12, marginBottom: 28 },
   featureRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   featureIcon: {
-    width: 24, height: 24, borderRadius: 12,
+    width: 24, height: 24, borderRadius: radii.sm,
     backgroundColor: C.accentGlow,
     alignItems: 'center', justifyContent: 'center',
   },
@@ -214,7 +215,7 @@ const makeStyles = (C) => StyleSheet.create({
   price: { fontSize: 36, fontWeight: '800', color: C.textPrimary },
   pricePer: { fontSize: 16, color: C.textSecondary, fontWeight: '500' },
   trialNote: { fontSize: 13, color: C.textMuted, textAlign: 'center', marginBottom: 24 },
-  primaryOuter: { borderRadius: 14, overflow: 'hidden', marginBottom: 12 },
+  primaryOuter: { borderRadius: radii.md, overflow: 'hidden', marginBottom: 12 },
   primaryBtn: { alignItems: 'center', justifyContent: 'center', paddingVertical: 17 },
   primaryText: { fontSize: 17, fontWeight: '700', color: '#fff', letterSpacing: -0.2 },
   secondaryBtn: {
@@ -222,7 +223,7 @@ const makeStyles = (C) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1.5,
     borderColor: C.border,
     marginBottom: 20,

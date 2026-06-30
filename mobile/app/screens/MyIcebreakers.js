@@ -16,6 +16,7 @@ import { useTheme } from '../context/ThemeContext';
 import IcebreakerCard from '../components/IcebreakerCard';
 import { getIcebreakerHistory, deleteIcebreaker } from '../services/api';
 import { useUser } from '../context/UserContext';
+import { radii } from '../constants/radii';
 
 export default function MyIcebreakers({ navigation }) {
   const { isPro, savedIcebreakers, removeIcebreaker } = useUser();
@@ -58,7 +59,7 @@ export default function MyIcebreakers({ navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.safe}>
-        <ActivityIndicator style={{ flex: 1 }} color={colors.accent} />
+        <ActivityIndicator style={styles.centered} color={colors.accent} />
       </SafeAreaView>
     );
   }
@@ -161,10 +162,10 @@ const makeStyles = (C) => StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: C.textPrimary },
   emptySub: { fontSize: 14, color: C.textSecondary, textAlign: 'center', lineHeight: 20 },
-  generateBtn: { borderRadius: 14, overflow: 'hidden', marginTop: 4, width: '100%' },
-  generateBtnInner: { paddingVertical: 15, alignItems: 'center', borderRadius: 14 },
+  generateBtn: { borderRadius: radii.md, overflow: 'hidden', marginTop: 4, width: '100%' },
+  generateBtnInner: { paddingVertical: 15, alignItems: 'center', borderRadius: radii.md },
   generateBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },
-  upgradeBanner: { marginHorizontal: 16, marginBottom: 8, borderRadius: 12, overflow: 'hidden' },
+  upgradeBanner: { marginHorizontal: 16, marginBottom: 8, borderRadius: radii.sm, overflow: 'hidden' },
   upgradeBannerInner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 11, gap: 8 },
   upgradeBannerText: { flex: 1, fontSize: 13, fontWeight: '600', color: '#fff' },
 });

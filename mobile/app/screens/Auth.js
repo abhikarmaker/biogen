@@ -21,6 +21,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { useTheme } from '../context/ThemeContext';
 import { login, register, completeGoogleLogin, loginWithApple } from '../services/auth';
 import { useUser } from '../context/UserContext';
+import { radii } from '../constants/radii';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -272,7 +273,7 @@ const makeStyles = (C) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: C.background },
   content: { flexGrow: 1, paddingHorizontal: 24, justifyContent: 'center', paddingVertical: 32 },
   logoSection: { alignItems: 'center', marginBottom: 44 },
-  logoMark: { width: 72, height: 72, borderRadius: 20, marginBottom: 14 },
+  logoMark: { width: 72, height: 72, borderRadius: radii.xl, marginBottom: 14 },
   logoText: { fontSize: 28, fontWeight: '800', color: C.textPrimary, letterSpacing: -0.5 },
   tagline: { fontSize: 15, color: C.textSecondary, marginTop: 6 },
   oauthSection: { gap: 12, marginBottom: 4 },
@@ -282,7 +283,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
     paddingVertical: 15,
@@ -300,7 +301,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
     paddingVertical: 15,
@@ -309,7 +310,7 @@ const makeStyles = (C) => StyleSheet.create({
   form: { gap: 12 },
   input: {
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
     paddingHorizontal: 16,
@@ -320,8 +321,8 @@ const makeStyles = (C) => StyleSheet.create({
   passWrap: { position: 'relative' },
   passInput: { paddingRight: 48 },
   eyeBtn: { position: 'absolute', right: 14, top: 0, bottom: 0, justifyContent: 'center' },
-  submitOuter: { borderRadius: 14, overflow: 'hidden', marginTop: 4 },
-  submitBtn: { paddingVertical: 17, alignItems: 'center', borderRadius: 14 },
+  submitOuter: { borderRadius: radii.md, overflow: 'hidden', marginTop: 4 },
+  submitBtn: { paddingVertical: 17, alignItems: 'center', borderRadius: radii.md },
   submitDisabled: { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border },
   submitText: { fontSize: 16, fontWeight: '700', color: '#fff' },
   switchMode: { paddingVertical: 8, alignItems: 'center' },

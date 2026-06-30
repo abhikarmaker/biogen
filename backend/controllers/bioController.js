@@ -1,15 +1,9 @@
 const supabase = require('../services/supabaseService');
 const { generateBio: callGemini } = require('../services/geminiService');
+const { CHAR_LIMITS } = require('../constants/platforms');
 
 // Template fallback — mirrors mobile mock, used when Gemini is unavailable
 function buildTemplateBio({ platform, role, interests, tone, length }) {
-  const CHAR_LIMITS = {
-    linkedin: 2600, instagram: 150, twitter: 160, threads: 150, hinge: 300, bumble: 300, tinder: 500,
-    okcupid: 500, cmb: 280, pof: 500, happn: 150,
-    tiktok: 80, youtube: 1000, github: 160, discord: 190, reddit: 200, substack: 280,
-    medium: 160, patreon: 250, fiverr: 600, facebook: 101, snapchat: 150, pinterest: 160,
-    telegram: 255, whatsapp: 139, mastodon: 500, bereal: 100, spotify: 1500, twitch: 300,
-  };
   const limit = CHAR_LIMITS[platform] || 300;
 
   const interestList = interests.split(/[,.\n]+/).map((s) => s.trim()).filter(Boolean);

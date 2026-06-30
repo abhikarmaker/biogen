@@ -15,7 +15,9 @@ import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useUser } from '../context/UserContext';
 import { useTheme } from '../context/ThemeContext';
 import PlatformCard from '../components/PlatformCard';
+import ProBadge from '../components/ProBadge';
 import { PLATFORMS } from '../constants/platforms';
+import { radii } from '../constants/radii';
 
 const FREE_LIMIT = 3;
 
@@ -111,16 +113,7 @@ export default function PlatformPicker({ navigation }) {
         <View style={styles.logoRow}>
           <Image source={require('../../assets/icon.png')} style={styles.logoMark} />
           <Text style={styles.logoText}>BioGen</Text>
-          {isPro && (
-            <LinearGradient
-              colors={['#FFD700', '#FFA500']}
-              style={styles.proBadge}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.proBadgeText}>PRO</Text>
-            </LinearGradient>
-          )}
+          {isPro && <ProBadge />}
         </View>
         <Text style={styles.title}>Choose your platform</Text>
         <Text style={styles.subtitle}>We'll craft a bio that fits perfectly</Text>
@@ -164,13 +157,13 @@ export default function PlatformPicker({ navigation }) {
             </LinearGradient>
           ) : selected && !canGenerate ? (
             <LinearGradient
-              colors={['#FFD700', '#FFA500']}
+              colors={[colors.proGold, colors.proGoldDark]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.cta}
             >
-              <MaterialCommunityIcons name="star-circle" size={18} color="#1A1000" style={styles.ctaIcon} />
-              <Text style={[styles.ctaText, { color: '#1A1000' }]}>{ctaLabel}</Text>
+              <MaterialCommunityIcons name="star-circle" size={18} color={colors.proText} style={styles.ctaIcon} />
+              <Text style={[styles.ctaText, { color: colors.proText }]}>{ctaLabel}</Text>
             </LinearGradient>
           ) : (
             <View style={styles.ctaDisabled}>
@@ -193,8 +186,6 @@ const makeStyles = (C) => StyleSheet.create({
   logoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 18, gap: 8 },
   logoMark: { width: 28, height: 28, borderRadius: 8 },
   logoText: { fontSize: 18, fontWeight: '800', color: C.textPrimary, letterSpacing: -0.3 },
-  proBadge: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, marginLeft: 2 },
-  proBadgeText: { fontSize: 9, fontWeight: '800', color: '#1A1000', letterSpacing: 0.8 },
   title: { fontSize: 26, fontWeight: '700', color: C.textPrimary, letterSpacing: -0.4, marginBottom: 6 },
   subtitle: { fontSize: 15, color: C.textSecondary, lineHeight: 22 },
   grid: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
@@ -209,7 +200,7 @@ const makeStyles = (C) => StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: C.border,
   },
-  ctaOuter: { borderRadius: 14, overflow: 'hidden' },
+  ctaOuter: { borderRadius: radii.md, overflow: 'hidden' },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -224,7 +215,7 @@ const makeStyles = (C) => StyleSheet.create({
     paddingVertical: 17,
     paddingHorizontal: 24,
     backgroundColor: C.surface,
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1,
     borderColor: C.border,
   },

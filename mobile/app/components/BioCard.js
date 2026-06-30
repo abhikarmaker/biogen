@@ -11,6 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { formatDistanceToNow } from 'date-fns';
 import { useTheme } from '../context/ThemeContext';
 import { PLATFORMS } from '../constants/platforms';
+import { radii } from '../constants/radii';
 
 const PLATFORM_NAMES = Object.fromEntries(PLATFORMS.map((p) => [p.id, p.name]));
 
@@ -77,7 +78,7 @@ export default function BioCard({ bio, onDelete, showDelete = false }) {
 const makeStyles = (C) => StyleSheet.create({
   card: {
     backgroundColor: C.surface,
-    borderRadius: 14,
+    borderRadius: radii.md,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,

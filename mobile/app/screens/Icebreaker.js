@@ -22,6 +22,7 @@ import { useUser } from '../context/UserContext';
 import TonePill from '../components/TonePill';
 import { getIcebreakerStreak } from '../services/storage';
 import { extractBioFromImages } from '../services/api';
+import { radii } from '../constants/radii';
 
 const TONES = ['Playful', 'Witty', 'Direct', 'Charming', 'Curious'];
 const MAX_BIO_LENGTH = 1000;
@@ -277,7 +278,7 @@ const makeStyles = (C) => StyleSheet.create({
   label: { fontSize: 14, fontWeight: '600', color: C.textSecondary, marginBottom: 8, letterSpacing: 0.2 },
   bioInput: {
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
     paddingHorizontal: 14,
@@ -305,7 +306,7 @@ const makeStyles = (C) => StyleSheet.create({
   },
   input: {
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
     paddingHorizontal: 14,
@@ -321,8 +322,8 @@ const makeStyles = (C) => StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: C.border,
   },
-  generateOuter: { borderRadius: 14, overflow: 'hidden' },
+  generateOuter: { borderRadius: radii.md, overflow: 'hidden' },
   generateBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 17, gap: 8 },
-  generateDisabled: { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 14 },
+  generateDisabled: { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: radii.md },
   generateText: { fontSize: 16, fontWeight: '700', color: '#fff', letterSpacing: -0.2 },
 });

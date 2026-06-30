@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { radii } from '../constants/radii';
 
 export default function TonePill({ label, isSelected, onPress }) {
   const { colors } = useTheme();
@@ -23,7 +24,7 @@ const makeStyles = (C) => StyleSheet.create({
   pill: {
     paddingHorizontal: 16,
     paddingVertical: 9,
-    borderRadius: 50,
+    borderRadius: radii.pill,
     borderWidth: 1.5,
     borderColor: C.border,
     backgroundColor: C.surface,

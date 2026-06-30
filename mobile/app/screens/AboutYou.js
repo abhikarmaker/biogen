@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import TonePill from '../components/TonePill';
 import { useTheme } from '../context/ThemeContext';
+import { radii } from '../constants/radii';
 
 const TONES = [
   'Friendly', 'Professional', 'Witty', 'Bold', 'Minimal',
@@ -321,7 +322,7 @@ const makeStyles = (C) => StyleSheet.create({
   label: { fontSize: 14, fontWeight: '600', color: C.textSecondary, marginBottom: 8, letterSpacing: 0.2 },
   input: {
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
     paddingHorizontal: 14,
@@ -330,14 +331,14 @@ const makeStyles = (C) => StyleSheet.create({
     color: C.textPrimary,
   },
   selectedTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 },
-  selectedTag: { borderRadius: 20, overflow: 'hidden' },
+  selectedTag: { borderRadius: radii.xl, overflow: 'hidden' },
   selectedTagInner: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 7, gap: 5 },
   selectedTagText: { fontSize: 13, fontWeight: '600', color: '#fff' },
   tagInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
     paddingHorizontal: 14,
@@ -357,7 +358,7 @@ const makeStyles = (C) => StyleSheet.create({
   suggestionTag: {
     paddingHorizontal: 12,
     paddingVertical: 7,
-    borderRadius: 20,
+    borderRadius: radii.xl,
     backgroundColor: C.surface,
     borderWidth: 1.5,
     borderColor: C.border,
@@ -373,8 +374,8 @@ const makeStyles = (C) => StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: C.border,
   },
-  generateOuter: { borderRadius: 14, overflow: 'hidden' },
+  generateOuter: { borderRadius: radii.md, overflow: 'hidden' },
   generateBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 17, gap: 8 },
-  generateDisabled: { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: 14 },
+  generateDisabled: { backgroundColor: C.surface, borderWidth: 1, borderColor: C.border, borderRadius: radii.md },
   generateText: { fontSize: 16, fontWeight: '700', color: '#fff', letterSpacing: -0.2 },
 });

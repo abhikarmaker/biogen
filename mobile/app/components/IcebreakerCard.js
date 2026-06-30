@@ -10,6 +10,7 @@ import * as Clipboard from 'expo-clipboard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { formatDistanceToNow } from 'date-fns';
 import { useTheme } from '../context/ThemeContext';
+import { radii } from '../constants/radii';
 
 export default function IcebreakerCard({ icebreaker, onDelete, showDelete = false }) {
   const { colors } = useTheme();
@@ -91,7 +92,7 @@ export default function IcebreakerCard({ icebreaker, onDelete, showDelete = fals
 const makeStyles = (C) => StyleSheet.create({
   card: {
     backgroundColor: C.surface,
-    borderRadius: 14,
+    borderRadius: radii.md,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,

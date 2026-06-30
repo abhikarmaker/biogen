@@ -14,6 +14,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useTheme } from '../context/ThemeContext';
 import ProBadge from '../components/ProBadge';
 import { useUser } from '../context/UserContext';
+import { radii } from '../constants/radii';
 
 export default function Result({ navigation, route }) {
   const { bio, platform } = route.params;
@@ -151,7 +152,7 @@ const makeStyles = (C) => StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingTop: 24 },
   bioCard: {
     backgroundColor: C.surface,
-    borderRadius: 16,
+    borderRadius: radii.lg,
     borderWidth: 1,
     borderColor: C.border,
     overflow: 'hidden',
@@ -168,7 +169,7 @@ const makeStyles = (C) => StyleSheet.create({
     gap: 7,
     paddingVertical: 13,
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.border,
   },
@@ -181,7 +182,7 @@ const makeStyles = (C) => StyleSheet.create({
     gap: 7,
     paddingVertical: 13,
     backgroundColor: C.surface,
-    borderRadius: 12,
+    borderRadius: radii.sm,
     borderWidth: 1.5,
     borderColor: C.borderSelected,
   },
@@ -189,7 +190,7 @@ const makeStyles = (C) => StyleSheet.create({
   regenText: { fontSize: 14, fontWeight: '600', color: C.accentLight },
   regenTextLocked: { color: C.textMuted },
   divider: { height: 1, backgroundColor: C.border, marginBottom: 24 },
-  generateOuter: { borderRadius: 14, overflow: 'hidden', marginBottom: 12 },
+  generateOuter: { borderRadius: radii.md, overflow: 'hidden', marginBottom: 12 },
   generateBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 17, gap: 8 },
   generateText: { fontSize: 16, fontWeight: '700', color: '#fff', letterSpacing: -0.2 },
   upgradeBtn: {
@@ -198,7 +199,7 @@ const makeStyles = (C) => StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: radii.md,
     borderWidth: 1.5,
     borderColor: C.warning,
     backgroundColor: 'rgba(251, 191, 36, 0.07)',
