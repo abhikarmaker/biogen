@@ -5,6 +5,7 @@ import Overview from './pages/Overview';
 import Users from './pages/Users';
 import Revenue from './pages/Revenue';
 import Bios from './pages/Bios';
+import Icebreakers from './pages/Icebreakers';
 import Errors from './pages/Errors';
 import AICosts from './pages/AICosts';
 import Settings from './pages/Settings';
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/users" element={<ProtectedLayout><Users /></ProtectedLayout>} />
         <Route path="/revenue" element={<ProtectedLayout><Revenue /></ProtectedLayout>} />
         <Route path="/bios" element={<ProtectedLayout><Bios /></ProtectedLayout>} />
+        <Route path="/icebreakers" element={<ProtectedLayout><Icebreakers /></ProtectedLayout>} />
         <Route path="/errors" element={<ProtectedLayout><Errors /></ProtectedLayout>} />
         <Route path="/ai-costs" element={<ProtectedLayout><AICosts /></ProtectedLayout>} />
         <Route path="/settings" element={<ProtectedLayout><Settings /></ProtectedLayout>} />

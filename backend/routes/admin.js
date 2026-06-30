@@ -80,6 +80,12 @@ router.get('/overview', adminMiddleware, async (req, res) => {
       supabase.from('users').select('created_at').gte('created_at', monthISO),
       supabase.from('bios').select('created_at').gte('created_at', monthISO),
       supabase.from('subscriptions').select('id, status, created_at, expires_at, users(email)').order('created_at', { ascending: false }).limit(20),
+      supabase.from('icebreakers').select('id', { count: 'exact', head: true }),
+      supabase.from('icebreakers').select('id', { count: 'exact', head: true }).gte('created_at', todayISO),
+      supabase.from('icebreakers').select('id', { count: 'exact', head: true }).gte('created_at', weekISO),
+      supabase.from('icebreakers').select('id, tone, match_bio, created_at, users(email)').order('created_at', { ascending: false }).limit(6),
+      supabase.from('icebreakers').select('tone').gte('created_at', monthISO),
+      supabase.from('icebreakers').select('created_at').gte('created_at', monthISO),
     ]);
 
     // Safely extract each result — a failed query (e.g. table doesn't exist yet) returns a fallback
@@ -95,6 +101,8 @@ router.get('/overview', adminMiddleware, async (req, res) => {
       platformBiosRes, toneBiosRes,
       signupTrendRes, bioTrendRes,
       subsRes,
+      totalIcebreakersRes, icebreakersTodayRes, icebreakersWeekRes,
+      recentIcebreakersRes, toneIcebreakersRes, icebreakerTrendRes,
     ] = [
       val(0,  { count: 0 }),
       val(1,  { count: 0 }),
@@ -112,6 +120,12 @@ router.get('/overview', adminMiddleware, async (req, res) => {
       val(13, { data: [] }),
       val(14, { data: [] }),
       val(15, { data: [] }),
+      val(16, { count: 0 }),
+      val(17, { count: 0 }),
+      val(18, { count: 0 }),
+      val(19, { data: [] }),
+      val(20, { data: [] }),
+      val(21, { data: [] }),
     ];
 
     const totalUsers = totalUsersRes.count || 0;
@@ -129,18 +143,24 @@ router.get('/overview', adminMiddleware, async (req, res) => {
       biosThisWeek: biosWeekRes.count || 0,
       newUsersToday: newUsersTodayRes.count || 0,
       newUsersThisWeek: newUsersWeekRes.count || 0,
+      totalIcebreakers: totalIcebreakersRes.count || 0,
+      icebreakersToday: icebreakersTodayRes.count || 0,
+      icebreakersThisWeek: icebreakersWeekRes.count || 0,
       // Computed
       avgBiosPerUser: totalUsers > 0 ? (totalBios / totalUsers).toFixed(1) : '0',
       conversionRate: totalUsers > 0 ? ((proUsers / totalUsers) * 100).toFixed(1) : '0',
       // Breakdowns (last 30 days)
       platformBreakdown: groupByField(platformBiosRes.data || [], 'platform'),
       toneBreakdown: groupByField(toneBiosRes.data || [], 'tone'),
+      icebreakerToneBreakdown: groupByField(toneIcebreakersRes.data || [], 'tone'),
       // Daily trends (last 30 days)
       signupsTrend: groupByDay(signupTrendRes.data || []),
       biosTrend: groupByDay(bioTrendRes.data || []),
+      icebreakersTrend: groupByDay(icebreakerTrendRes.data || []),
       // Recent activity
       recentUsers: recentUsersRes.data || [],
       recentBios: recentBiosRes.data || [],
+      recentIcebreakers: recentIcebreakersRes.data || [],
       // Subscriptions
       recentSubscriptions: subsRes.data || [],
     });
@@ -207,6 +227,36 @@ router.get('/bios', adminMiddleware, async (req, res) => {
 
 router.delete('/bios/:id', adminMiddleware, async (req, res) => {
   const { error } = await supabase.from('bios').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  return res.json({ success: true });
+});
+
+// ── Icebreakers ──────────────────────────────────────────
+router.get('/icebreakers', adminMiddleware, async (req, res) => {
+  const { tone, from, to, limit = 50, offset = 0 } = req.query;
+
+  let query = supabase
+    .from('icebreakers')
+    .select('id, user_id, match_bio, tone, reference, openers, created_at, users(email)', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(Number(offset), Number(offset) + Number(limit) - 1);
+
+  if (tone) query = query.eq('tone', tone);
+  if (from) query = query.gte('created_at', from);
+  if (to) query = query.lte('created_at', to);
+
+  const { data, count, error } = await query;
+  if (error) {
+    // 42P01 = relation (table) does not exist in PostgreSQL
+    if (error.code === '42P01') return res.json({ setup_required: true, icebreakers: [], total: 0 });
+    return res.status(500).json({ error: error.message });
+  }
+
+  return res.json({ icebreakers: data, total: count });
+});
+
+router.delete('/icebreakers/:id', adminMiddleware, async (req, res) => {
+  const { error } = await supabase.from('icebreakers').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
   return res.json({ success: true });
 });

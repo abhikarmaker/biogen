@@ -28,6 +28,8 @@ export const updateUserPlan = (id, plan) => api.put(`/api/admin/users/${id}/plan
 export const deleteUser = (id) => api.delete(`/api/admin/users/${id}`);
 export const getBios = (params) => api.get('/api/admin/bios', { params });
 export const deleteBioAdmin = (id) => api.delete(`/api/admin/bios/${id}`);
+export const getIcebreakers = (params) => api.get('/api/admin/icebreakers', { params });
+export const deleteIcebreakerAdmin = (id) => api.delete(`/api/admin/icebreakers/${id}`);
 export const getErrors = () => api.get('/api/admin/errors');
 export const getHealth = () => api.get('/api/admin/health');
 export const getSettings = () => api.get('/api/admin/settings');

@@ -109,6 +109,8 @@ export default function Overview() {
     { label: 'New users this week',value: data?.newUsersThisWeek?.toLocaleString() ?? '—',  icon: '📅' },
     { label: 'Bios today',         value: data?.biosToday?.toLocaleString() ?? '—',         icon: '📝' },
     { label: 'Avg bios / user',    value: data?.avgBiosPerUser ?? '—',                      icon: '📊' },
+    { label: 'Icebreakers generated', value: data?.totalIcebreakers?.toLocaleString() ?? '—', icon: '💬' },
+    { label: 'Icebreakers today',  value: data?.icebreakersToday?.toLocaleString() ?? '—',  icon: '🔥' },
   ];
 
   // Merge and sort recent activity, guard against missing timestamps
@@ -126,6 +128,13 @@ export default function Overview() {
       title: b.users?.email || 'Unknown',
       sub: `Generated a bio on ${PLATFORM_LABELS[b.platform] || b.platform}${b.tone ? ` · ${b.tone}` : ''}`,
       ts: b.created_at,
+    })),
+    ...(data?.recentIcebreakers || []).map((i) => ({
+      type: 'icebreaker',
+      icon: '💬',
+      title: i.users?.email || 'Unknown',
+      sub: `Generated icebreakers${i.tone ? ` · ${i.tone}` : ''}`,
+      ts: i.created_at,
     })),
   ]
     .filter((a) => !!a.ts)

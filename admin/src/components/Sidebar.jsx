@@ -6,6 +6,7 @@ const NAV = [
   { to: '/users',     label: 'Users',     icon: '👥' },
   { to: '/revenue',   label: 'Revenue',   icon: '💰' },
   { to: '/bios',      label: 'Bios',      icon: '✍️' },
+  { to: '/icebreakers', label: 'Icebreakers', icon: '💬' },
   { to: '/errors',    label: 'Errors',    icon: '🚨' },
   { to: '/ai-costs',  label: 'AI Costs',  icon: '🤖' },
   { to: '/settings',  label: 'Settings',  icon: '⚙️' },
