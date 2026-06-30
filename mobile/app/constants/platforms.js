@@ -27,6 +27,42 @@ export const PLATFORMS = [
     gradientColors: ['#FF7854', '#FD5564'],
     charLimit: 500,
   },
+  {
+    id: 'okcupid',
+    name: 'OkCupid',
+    type: 'Dating',
+    iconName: 'heart-circle',
+    color: '#5B0AE8',
+    gradientColors: ['#8A2BE2', '#5B0AE8'],
+    charLimit: 500,
+  },
+  {
+    id: 'cmb',
+    name: 'Coffee Meets Bagel',
+    type: 'Dating',
+    iconName: 'coffee-outline',
+    color: '#7B3F61',
+    gradientColors: ['#A85C7C', '#7B3F61'],
+    charLimit: 280,
+  },
+  {
+    id: 'pof',
+    name: 'Plenty of Fish',
+    type: 'Dating',
+    iconName: 'fish',
+    color: '#0099E5',
+    gradientColors: ['#22B2FF', '#0099E5'],
+    charLimit: 500,
+  },
+  {
+    id: 'happn',
+    name: 'Happn',
+    type: 'Dating',
+    iconName: 'map-marker-radius',
+    color: '#00C2CB',
+    gradientColors: ['#3CE0E8', '#00C2CB'],
+    charLimit: 150,
+  },
 
   // ── Social ────────────────────────────────────────
   {

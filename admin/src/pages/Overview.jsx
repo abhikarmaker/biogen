@@ -10,7 +10,8 @@ import { format, parseISO } from 'date-fns';
 const PLATFORM_LABELS = {
   linkedin: 'LinkedIn', instagram: 'Instagram', twitter: 'X', threads: 'Threads',
   tiktok: 'TikTok', youtube: 'YouTube', hinge: 'Hinge', bumble: 'Bumble',
-  tinder: 'Tinder', github: 'GitHub', discord: 'Discord', reddit: 'Reddit',
+  tinder: 'Tinder', okcupid: 'OkCupid', cmb: 'Coffee Meets Bagel', pof: 'Plenty of Fish', happn: 'Happn',
+  github: 'GitHub', discord: 'Discord', reddit: 'Reddit',
   substack: 'Substack', medium: 'Medium', patreon: 'Patreon', fiverr: 'Fiverr',
   facebook: 'Facebook', snapchat: 'Snapchat', pinterest: 'Pinterest',
   telegram: 'Telegram', whatsapp: 'WhatsApp', spotify: 'Spotify', twitch: 'Twitch',

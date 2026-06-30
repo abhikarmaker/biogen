@@ -111,6 +111,9 @@ export default function Icebreaker({ navigation }) {
       tone,
       reference: reference.trim(),
     });
+    setMatchBio('');
+    setReference('');
+    setScreenshots([]);
   };
 
   return (
