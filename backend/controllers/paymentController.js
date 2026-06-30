@@ -63,10 +63,12 @@ async function webhook(req, res) {
     event = constructWebhookEvent(req.body, sig);
   } catch (err) {
     console.error('[webhook] signature error:', err.message);
-    await supabase.from('error_logs').insert({
-      type: 'stripe_webhook_error',
-      message: err.message,
-    }).catch(() => {});
+    try {
+      await supabase.from('error_logs').insert({
+        type: 'stripe_webhook_error',
+        message: err.message,
+      });
+    } catch (_) {}
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 

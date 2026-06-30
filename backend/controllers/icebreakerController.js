@@ -69,12 +69,14 @@ async function generate(req, res) {
     openers = await callGemini({ matchBio, tone, reference });
   } catch (err) {
     console.error('[gemini-icebreaker]', err.message);
-    await supabase.from('error_logs').insert({
-      user_id: req.user.id,
-      type: 'gemini_error',
-      message: err.message,
-      endpoint: '/api/icebreaker/generate',
-    }).catch(() => {});
+    try {
+      await supabase.from('error_logs').insert({
+        user_id: req.user.id,
+        type: 'gemini_error',
+        message: err.message,
+        endpoint: '/api/icebreaker/generate',
+      });
+    } catch (_) {}
 
     openers = buildTemplateIcebreakers({ matchBio, tone, reference });
     usedFallback = true;
@@ -149,12 +151,14 @@ async function extractBio(req, res) {
     return res.json({ bio: bio.slice(0, MAX_BIO_LENGTH) });
   } catch (err) {
     console.error('[extract-bio]', err.message);
-    await supabase.from('error_logs').insert({
-      user_id: req.user.id,
-      type: 'gemini_error',
-      message: err.message,
-      endpoint: '/api/icebreaker/extract-bio',
-    }).catch(() => {});
+    try {
+      await supabase.from('error_logs').insert({
+        user_id: req.user.id,
+        type: 'gemini_error',
+        message: err.message,
+        endpoint: '/api/icebreaker/extract-bio',
+      });
+    } catch (_) {}
     return res.status(502).json({ error: "Couldn't read those screenshots. Try again or paste the bio manually." });
   }
 }

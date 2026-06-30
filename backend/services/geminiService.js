@@ -40,11 +40,37 @@ const LENGTH_GUIDANCE = {
   Long: 'Write a fuller bio with personality and detail.',
 };
 
+// Maps platform ids to a human-readable name for the prompt — some ids
+// (e.g. "cmb", "pof") aren't recognizable to the model on their own.
+const PLATFORM_NAMES = {
+  linkedin: 'LinkedIn', instagram: 'Instagram', twitter: 'X (Twitter)', threads: 'Threads',
+  hinge: 'Hinge', bumble: 'Bumble', tinder: 'Tinder', okcupid: 'OkCupid',
+  cmb: 'Coffee Meets Bagel', pof: 'Plenty of Fish', happn: 'Happn',
+  tiktok: 'TikTok', youtube: 'YouTube', github: 'GitHub', discord: 'Discord',
+  reddit: 'Reddit', substack: 'Substack', medium: 'Medium', patreon: 'Patreon',
+  fiverr: 'Fiverr', facebook: 'Facebook', snapchat: 'Snapchat', pinterest: 'Pinterest',
+  telegram: 'Telegram', whatsapp: 'WhatsApp', mastodon: 'Mastodon', bereal: 'BeReal',
+  spotify: 'Spotify', twitch: 'Twitch',
+};
+
+// Per-app cultural guidance so dating bios don't all read the same way.
+const DATING_VIBE = {
+  hinge: 'Hinge bios are often built around a prompt-style format — conversational and a little vulnerable, designed to spark a specific question rather than just list traits.',
+  bumble: 'Bumble bios tend to be confident and a bit playful, since women message first — give the reader something specific and easy to open with.',
+  tinder: 'Tinder bios are casual, punchy, and a little flirty — a quick hook over a detailed self-summary.',
+  okcupid: 'OkCupid bios reward personality and specificity — slightly longer, witty, opinionated, almost a conversation starter in itself.',
+  cmb: 'Coffee Meets Bagel bios should feel intentional and low-key, written for someone looking for something real rather than a highlight reel.',
+  pof: 'Plenty of Fish bios are straightforward and down-to-earth — plainspoken and friendly, no gimmicks.',
+  happn: 'Happn bios should feel grounded in everyday life and place — casual and approachable, like running into someone interesting nearby.',
+};
+
 async function generateBio({ platform, role, interests, tone, length }) {
   const charLimit = CHAR_LIMITS[platform] || 300;
   const lengthGuide = LENGTH_GUIDANCE[length] || LENGTH_GUIDANCE.Medium;
+  const platformName = PLATFORM_NAMES[platform] || platform;
+  const vibe = DATING_VIBE[platform];
 
-  const prompt = `Write a ${length.toLowerCase()}, ${tone.toLowerCase()} bio for ${platform} for someone who ${role}. They love ${interests}. ${lengthGuide} The bio should feel natural, human, and authentic. No hashtags. No filler phrases like "passionate about" or "I am a". Max ${charLimit} characters. Return only the bio text, nothing else.`;
+  const prompt = `Write a ${length.toLowerCase()}, ${tone.toLowerCase()} bio for ${platformName} for someone who ${role}. They love ${interests}. ${lengthGuide}${vibe ? ` ${vibe}` : ''} The bio should feel natural, human, and authentic. No hashtags. No filler phrases like "passionate about" or "I am a". Max ${charLimit} characters. Return only the bio text, nothing else.`;
 
   const model = genAI.getGenerativeModel({
     model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',

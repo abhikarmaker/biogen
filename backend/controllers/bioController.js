@@ -80,12 +80,14 @@ async function generate(req, res) {
   } catch (err) {
     console.error('[gemini]', err.message);
     // Log error but continue with template fallback — don't fail the request
-    await supabase.from('error_logs').insert({
-      user_id: req.user.id,
-      type: 'gemini_error',
-      message: err.message,
-      endpoint: '/api/bio/generate',
-    }).catch(() => {});
+    try {
+      await supabase.from('error_logs').insert({
+        user_id: req.user.id,
+        type: 'gemini_error',
+        message: err.message,
+        endpoint: '/api/bio/generate',
+      });
+    } catch (_) {}
 
     bioContent = buildTemplateBio({ platform, role, interests, tone, length });
     usedFallback = true;
