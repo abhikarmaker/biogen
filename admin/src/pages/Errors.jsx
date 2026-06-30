@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DataTable from '../components/DataTable';
 import { getErrors } from '../lib/api';
+import { markErrorsSeen } from '../lib/notifications';
 import { format } from 'date-fns';
 
 const COLUMNS = [
@@ -28,6 +29,7 @@ export default function Errors() {
   const [setupRequired, setSetupRequired] = useState(false);
 
   useEffect(() => {
+    markErrorsSeen();
     getErrors()
       .then((d) => {
         if (d.setup_required) setSetupRequired(true);

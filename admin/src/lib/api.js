@@ -31,6 +31,7 @@ export const deleteBioAdmin = (id) => api.delete(`/api/admin/bios/${id}`);
 export const getIcebreakers = (params) => api.get('/api/admin/icebreakers', { params });
 export const deleteIcebreakerAdmin = (id) => api.delete(`/api/admin/icebreakers/${id}`);
 export const getErrors = () => api.get('/api/admin/errors');
+export const getErrorsUnreadCount = (since) => api.get('/api/admin/errors/unread-count', { params: { since } });
 export const getHealth = () => api.get('/api/admin/health');
 export const getSettings = () => api.get('/api/admin/settings');
 export const updateSettings = (data) => api.put('/api/admin/settings', data);

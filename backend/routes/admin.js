@@ -305,4 +305,15 @@ router.get('/errors', adminMiddleware, async (req, res) => {
   return res.json({ errors: data || [] });
 });
 
+// Count of errors logged after `since` — powers the sidebar unread badge
+router.get('/errors/unread-count', adminMiddleware, async (req, res) => {
+  const { since } = req.query;
+  let query = supabase.from('error_logs').select('id', { count: 'exact', head: true });
+  if (since) query = query.gt('created_at', since);
+
+  const { count, error } = await query;
+  if (error) return res.json({ count: 0 }); // table missing or other issue — fail quiet, badge just won't show
+  return res.json({ count: count || 0 });
+});
+
 module.exports = router;

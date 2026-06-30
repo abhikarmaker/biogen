@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { getErrorsUnreadCount } from '../lib/api';
+import { getErrorsLastSeen, onErrorsSeen } from '../lib/notifications';
+
+const POLL_INTERVAL_MS = 20000;
 
 const NAV = [
   { to: '/',          label: 'Overview',  icon: '📊' },
@@ -14,6 +18,23 @@ const NAV = [
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const [unreadErrors, setUnreadErrors] = useState(0);
+
+  const refreshUnread = useCallback(() => {
+    getErrorsUnreadCount(getErrorsLastSeen())
+      .then((d) => setUnreadErrors(d.count || 0))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    refreshUnread();
+    const interval = setInterval(refreshUnread, POLL_INTERVAL_MS);
+    const unsubscribe = onErrorsSeen(refreshUnread);
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, [refreshUnread]);
 
   const handleLogout = () => {
     localStorage.removeItem('biogen_admin_token');
@@ -50,6 +71,11 @@ export default function Sidebar() {
           >
             <span>{icon}</span>
             {label}
+            {to === '/errors' && unreadErrors > 0 && (
+              <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                {unreadErrors > 99 ? '99+' : unreadErrors}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
