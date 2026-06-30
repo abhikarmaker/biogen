@@ -84,7 +84,7 @@ async function generateBio({ platform, role, interests, tone, length }) {
   const prompt = `Write a ${length.toLowerCase()}, ${tone.toLowerCase()} bio for ${platformName} for someone who ${role}. They love ${interests}. ${lengthGuide}${vibe ? ` ${vibe}` : ''} ${angle} The bio should feel natural, human, and authentic. No hashtags. No filler phrases like "passionate about" or "I am a". Max ${charLimit} characters. Return only the bio text, nothing else.`;
 
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
   });
 
   const result = await model.generateContent(prompt);
@@ -105,7 +105,7 @@ async function generateIcebreakers({ matchBio, tone, reference }) {
   const prompt = `Someone's dating app bio is: "${matchBio}". Write exactly 3 short, ${tone.toLowerCase()} opening messages to send them on a dating app. ${referenceLine} Each opener should be a single message, 1-2 sentences, no emojis unless ${tone.toLowerCase() === 'playful' ? 'it fits naturally' : 'never'}, no generic lines like "hey" or "how's your day going". Make each of the 3 openers distinct from each other in angle or phrasing. Return only the 3 openers, one per line, with no numbering, labels, or extra commentary.`;
 
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
   });
 
   const result = await model.generateContent(prompt);
@@ -128,7 +128,7 @@ async function extractBioFromImages(images) {
   const prompt = `These are screenshot(s) of someone's dating app profile. Extract and return only the bio text they wrote about themselves — their prompts/answers, captions, and written details. Ignore UI elements like buttons, percentages, distances, icons, and navigation chrome. If there are multiple screenshots, combine the text in natural reading order. Return only the extracted text, no commentary, no markdown, no surrounding quotes.`;
 
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
   });
 
   const imageParts = images.map((img) => ({
