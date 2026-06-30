@@ -3,6 +3,29 @@ const { CHAR_LIMITS, PLATFORM_NAMES } = require('../constants/platforms');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Each model has its own free-tier quota bucket, and transient 503 "high
+// demand" errors are per-model too — so trying a second model on failure
+// recovers requests that would otherwise drop straight to the local
+// template fallback. Order matters: cheapest/highest-quota model first.
+const MODEL_CASCADE = [...new Set([
+  process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
+  'gemini-2.5-flash',
+])];
+
+async function generateWithCascade(parts) {
+  let lastErr;
+  for (const model of MODEL_CASCADE) {
+    try {
+      const result = await genAI.getGenerativeModel({ model }).generateContent(parts);
+      return result.response.text().trim();
+    } catch (err) {
+      console.error(`[gemini:${model}]`, err.message);
+      lastErr = err;
+    }
+  }
+  throw lastErr;
+}
+
 const LENGTH_GUIDANCE = {
   Short: 'Keep it very concise — one or two sentences.',
   Medium: 'Aim for 3–5 sentences with good flow.',
@@ -39,12 +62,7 @@ async function generateBio({ platform, role, interests, tone, length }) {
 
   const prompt = `Write a ${length.toLowerCase()}, ${tone.toLowerCase()} bio for ${platformName} for someone who ${role}. They love ${interests}. ${lengthGuide}${vibe ? ` ${vibe}` : ''} ${angle} The bio should feel natural, human, and authentic. No hashtags. No filler phrases like "passionate about" or "I am a". Max ${charLimit} characters. Return only the bio text, nothing else.`;
 
-  const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
-  });
-
-  const result = await model.generateContent(prompt);
-  const text = result.response.text().trim();
+  const text = await generateWithCascade(prompt);
 
   // Enforce hard character limit
   if (text.length > charLimit) {
@@ -60,12 +78,7 @@ async function generateIcebreakers({ matchBio, tone, reference }) {
 
   const prompt = `Someone's dating app bio is: "${matchBio}". Write exactly 3 short, ${tone.toLowerCase()} opening messages to send them on a dating app. ${referenceLine} Each opener should be a single message, 1-2 sentences, no emojis unless ${tone.toLowerCase() === 'playful' ? 'it fits naturally' : 'never'}, no generic lines like "hey" or "how's your day going". Make each of the 3 openers distinct from each other in angle or phrasing. Return only the 3 openers, one per line, with no numbering, labels, or extra commentary.`;
 
-  const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
-  });
-
-  const result = await model.generateContent(prompt);
-  const text = result.response.text().trim();
+  const text = await generateWithCascade(prompt);
 
   const openers = text
     .split('\n')
@@ -83,16 +96,11 @@ async function generateIcebreakers({ matchBio, tone, reference }) {
 async function extractBioFromImages(images) {
   const prompt = `These are screenshot(s) of someone's dating app profile. Extract and return only the bio text they wrote about themselves — their prompts/answers, captions, and written details. Ignore UI elements like buttons, percentages, distances, icons, and navigation chrome. If there are multiple screenshots, combine the text in natural reading order. Return only the extracted text, no commentary, no markdown, no surrounding quotes.`;
 
-  const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
-  });
-
   const imageParts = images.map((img) => ({
     inlineData: { data: img.base64, mimeType: img.mimeType },
   }));
 
-  const result = await model.generateContent([prompt, ...imageParts]);
-  return result.response.text().trim();
+  return generateWithCascade([prompt, ...imageParts]);
 }
 
 module.exports = { generateBio, generateIcebreakers, extractBioFromImages };
