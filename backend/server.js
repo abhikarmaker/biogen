@@ -82,7 +82,7 @@ app.use('/api/admin', adminRoutes);
 
 // Health check (used by Render.com)
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', version: require('./package.json').version, timestamp: new Date().toISOString() });
 });
 
 // Global error handler
