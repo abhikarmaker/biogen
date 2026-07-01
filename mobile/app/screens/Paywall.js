@@ -14,9 +14,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import ProBadge from '../components/ProBadge';
-import { createSubscription, createOneTimePayment } from '../services/api';
+import { getOfferings, purchasePackage } from '../services/purchases';
 import { useUser } from '../context/UserContext';
 import { radii } from '../constants/radii';
+
+// Converts a RevenueCat introPrice period (e.g. { periodNumberOfUnits: 3, periodUnit: 'DAY' })
+// into display copy — kept dynamic so it can't drift out of sync with whatever
+// trial length is actually configured in App Store Connect / Play Console.
+function formatIntroPeriod(introPrice) {
+  if (!introPrice?.periodNumberOfUnits || !introPrice?.periodUnit) return null;
+  const unit = introPrice.periodUnit.toLowerCase();
+  const n = introPrice.periodNumberOfUnits;
+  return `${n}-${unit}${n > 1 ? 's' : ''}`;
+}
 
 const FEATURES = [
   'Unlimited bios across all platforms',
@@ -27,11 +37,13 @@ const FEATURES = [
 ];
 
 export default function Paywall({ navigation }) {
-  const { user, refreshUser, upgradeToPro, isPro } = useUser();
+  const { refreshUser, upgradeToPro, isPro } = useUser();
   const { colors } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
   const [loadingSub, setLoadingSub] = useState(false);
   const [loadingOne, setLoadingOne] = useState(false);
+  const [monthlyPkg, setMonthlyPkg] = useState(null);
+  const [lifetimePkg, setLifetimePkg] = useState(null);
 
   // Paywall can be opened from other tabs (Account, My Bios) where the
   // GenerateStack may have no prior screen. canGoBack() guards against that.
@@ -46,44 +58,51 @@ export default function Paywall({ navigation }) {
   // Refresh plan on mount — catches stale cached plan (e.g. purchase completed elsewhere)
   useEffect(() => { refreshUser(); }, []);
 
+  // Load the current offering's packages — null/empty when RevenueCat isn't
+  // configured yet, which the buttons below treat as a normal "coming soon" state.
+  useEffect(() => {
+    getOfferings().then((offering) => {
+      const packages = offering?.availablePackages || [];
+      setMonthlyPkg(packages.find((p) => p.packageType === 'MONTHLY') || null);
+      setLifetimePkg(packages.find((p) => p.packageType === 'LIFETIME') || null);
+    });
+  }, []);
+
   // Auto-dismiss if already Pro (stale cache resolved or just purchased)
   useEffect(() => {
     if (isPro) dismiss();
   }, [isPro, dismiss]);
 
-  const handleSubscribe = async () => {
-    setLoadingSub(true);
+  const handlePurchase = async (pkg, setLoading) => {
+    if (!pkg) {
+      Alert.alert('Coming soon', 'Payments are not set up yet. Check back soon!');
+      return;
+    }
+    setLoading(true);
     try {
-      await createSubscription({ plan: 'monthly' });
+      const customerInfo = await purchasePackage(pkg);
+      if (customerInfo?.entitlements?.active?.pro) upgradeToPro();
       await refreshUser();
       dismiss();
     } catch (err) {
-      if (err.message?.includes('not configured')) {
+      if (err.userCancelled) {
+        // User dismissed the native purchase sheet — not an error, stay silent.
+      } else if (err.message?.includes('not configured')) {
         Alert.alert('Coming soon', 'Payments are not set up yet. Check back soon!');
       } else {
         Alert.alert('Payment failed', err.message || 'Something went wrong. Please try again.');
       }
     } finally {
-      setLoadingSub(false);
+      setLoading(false);
     }
   };
 
-  const handleOneTime = async () => {
-    setLoadingOne(true);
-    try {
-      await createOneTimePayment({ product: 'lifetime' });
-      await refreshUser();
-      dismiss();
-    } catch (err) {
-      if (err.message?.includes('not configured')) {
-        Alert.alert('Coming soon', 'Payments are not set up yet. Check back soon!');
-      } else {
-        Alert.alert('Payment failed', err.message || 'Something went wrong. Please try again.');
-      }
-    } finally {
-      setLoadingOne(false);
-    }
-  };
+  const handleSubscribe = () => handlePurchase(monthlyPkg, setLoadingSub);
+  const handleOneTime = () => handlePurchase(lifetimePkg, setLoadingOne);
+
+  const monthlyPrice = monthlyPkg?.product?.priceString || '$4.99';
+  const lifetimePrice = lifetimePkg?.product?.priceString || '$9.99';
+  const trialPeriod = formatIntroPeriod(monthlyPkg?.product?.introPrice) || '3-day';
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -125,10 +144,10 @@ export default function Paywall({ navigation }) {
         </View>
 
         <View style={styles.priceBlock}>
-          <Text style={styles.price}>$4.99</Text>
+          <Text style={styles.price}>{monthlyPrice}</Text>
           <Text style={styles.pricePer}>/month</Text>
         </View>
-        <Text style={styles.trialNote}>3-day free trial · Cancel anytime</Text>
+        <Text style={styles.trialNote}>{trialPeriod} free trial · Cancel anytime</Text>
 
         <TouchableOpacity
           onPress={handleSubscribe}
@@ -145,7 +164,7 @@ export default function Paywall({ navigation }) {
             {loadingSub ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.primaryText}>Start free 3-day trial</Text>
+              <Text style={styles.primaryText}>Start free {trialPeriod} trial</Text>
             )}
           </LinearGradient>
         </TouchableOpacity>
@@ -161,7 +180,7 @@ export default function Paywall({ navigation }) {
           ) : (
             <>
               <Text style={styles.secondaryText}>One-time unlock</Text>
-              <Text style={styles.secondaryPrice}> — $9.99 forever</Text>
+              <Text style={styles.secondaryPrice}> — {lifetimePrice} forever</Text>
             </>
           )}
         </TouchableOpacity>

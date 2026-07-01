@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { getUser, getToken, removeAvatarUri, removeDisplayName } from '../services/storage';
 import { getUserProfile } from '../services/api';
 import { logout as authLogout } from '../services/auth';
+import { initPurchases, logoutPurchases } from '../services/purchases';
 
 const UserContext = createContext(null);
 
@@ -28,6 +29,10 @@ export function UserProvider({ children }) {
 
       // If we have a real JWT (not local-session), fetch fresh profile in the background
       if (token !== 'local-session') {
+        // Only identify to RevenueCat with a real backend-issued account — a
+        // local-session id is fabricated client-side and can never reconcile
+        // with a real users.id row via the webhook.
+        initPurchases(stored.id);
         try {
           const fresh = await getUserProfile();
           setUser(fresh);
@@ -40,13 +45,21 @@ export function UserProvider({ children }) {
 
   useEffect(() => { loadUser(); }, [loadUser]);
 
-  const login = (userData) => {
+  const login = async (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
+    // auth.js falls back to a fabricated local user + 'local-session' token
+    // when the backend is unreachable — only identify to RevenueCat once we
+    // know this is a real backend-issued account.
+    const token = await getToken();
+    if (token !== 'local-session') {
+      initPurchases(userData.id);
+    }
   };
 
   const logout = async () => {
     const uid = user?.id;
+    await logoutPurchases();
     await authLogout();
     if (uid) {
       await Promise.all([removeAvatarUri(uid), removeDisplayName(uid)]);
