@@ -1,7 +1,12 @@
 require('dotenv').config();
+const Sentry = require('@sentry/node');
 const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({ dsn: process.env.SENTRY_DSN });
+}
 
 const authRoutes = require('./routes/auth');
 const bioRoutes = require('./routes/bio');
@@ -81,17 +86,23 @@ app.get('/health', (_req, res) => {
 });
 
 // Global error handler
-// eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
   console.error('[ERROR]', err.message);
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureException(err);
+  }
   res.status(err.status || 500).json({
     error: err.message || 'Internal server error',
   });
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`BioGen API running on port ${PORT}`);
-});
+// Only bind a real port when run directly (`node server.js` / `npm start`) —
+// requiring this module from tests (supertest) must not also start a listener.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`BioGen API running on port ${PORT}`);
+  });
+}
 
 module.exports = app;
