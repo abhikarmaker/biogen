@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminLogin } from '../lib/api';
 
-const DEMO_EMAIL = 'admin@biogen.app';
-const DEMO_PASS = 'admin123';
-
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState(DEMO_EMAIL);
-  const [password, setPassword] = useState(DEMO_PASS);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -83,10 +80,6 @@ export default function Login() {
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
-
-          <p className="text-center text-xs text-gray-600 pt-1">
-            Demo: <span className="text-gray-400">{DEMO_EMAIL} / {DEMO_PASS}</span>
-          </p>
         </form>
       </div>
     </div>

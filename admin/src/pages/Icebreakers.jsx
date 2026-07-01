@@ -112,7 +112,7 @@ export default function Icebreakers() {
 
       {setupRequired && (
         <div className="bg-yellow-900/20 border border-yellow-800 rounded-xl p-4 mb-6 text-sm text-yellow-300">
-          The <code className="text-yellow-200">icebreakers</code> table hasn't been created in Supabase yet — run the migration to start seeing data here.
+          The <code className="text-yellow-200">icebreakers</code> table hasn&apos;t been created in Supabase yet — run the migration to start seeing data here.
         </div>
       )}
 
