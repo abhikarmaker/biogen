@@ -41,12 +41,5 @@ export const deleteIcebreaker = (id) => api.delete(`/api/icebreaker/${id}`);
 
 // User
 export const getUserProfile = () => api.get('/api/user/profile');
-export const restorePurchases = () => api.post('/api/user/restore');
-
-// Payments
-export const createSubscription = (payload) =>
-  api.post('/api/payments/subscribe', payload);
-export const createOneTimePayment = (payload) =>
-  api.post('/api/payments/one-time', payload);
 
 export default api;

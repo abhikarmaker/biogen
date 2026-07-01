@@ -1,3 +1,7 @@
+// Mobile now upgrades users to Pro via RevenueCat (see revenuecatController.js)
+// to comply with Apple/Google in-app purchase requirements. These Stripe
+// endpoints are unused by the mobile client but left in place for a possible
+// future web checkout flow.
 const supabase = require('../services/supabaseService');
 const {
   getOrCreateCustomer,

@@ -20,7 +20,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../context/UserContext';
 import ProBadge from '../components/ProBadge';
-import { restorePurchases } from '../services/api';
+import { restoreNativePurchases, isEntitledPro } from '../services/purchases';
 import { saveAvatarUri, getAvatarUri, saveDisplayName, getDisplayName } from '../services/storage';
 import { format } from 'date-fns';
 import { radii } from '../constants/radii';
@@ -60,7 +60,7 @@ const THEME_OPTIONS = [
 ];
 
 export default function Account({ navigation }) {
-  const { user, isPro, logout, refreshUser } = useUser();
+  const { user, isPro, logout, refreshUser, upgradeToPro } = useUser();
   const { colors, theme, setTheme } = useTheme();
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
@@ -122,7 +122,10 @@ export default function Account({ navigation }) {
   const handleRestore = async () => {
     setRestoring(true);
     try {
-      await restorePurchases();
+      const customerInfo = await restoreNativePurchases();
+      // Optimistic local flip for instant feedback — refreshUser() below picks
+      // up the authoritative plan once the RevenueCat webhook has landed.
+      if (isEntitledPro(customerInfo)) upgradeToPro();
       await refreshUser();
       Alert.alert('Done', 'Purchases restored successfully.');
     } catch {

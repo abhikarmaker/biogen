@@ -32,13 +32,6 @@
     },
     "plugins": [
       [
-        "@stripe/stripe-react-native",
-        {
-          "merchantIdentifier": "merchant.com.biogen.app",
-          "enableGooglePay": false
-        }
-      ],
-      [
         "expo-secure-store",
         {
           "faceIDPermission": "Allow BioGen to access Face ID for secure authentication."
